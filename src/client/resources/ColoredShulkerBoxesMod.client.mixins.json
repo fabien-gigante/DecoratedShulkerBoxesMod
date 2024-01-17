@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "com.fabien_gigante.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"client": [
+		"ShulkerBoxBlockEntityRendererMixin",
+		"BuiltinModelItemRendererMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

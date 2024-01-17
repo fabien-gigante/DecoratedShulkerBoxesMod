@@ -1,0 +1,14 @@
+{
+	"required": true,
+	"package": "com.fabien_gigante.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"IronGolemEntityMixin",
+		"ShulkerBoxBlockEntityMixin",
+		"ShulkerBoxBlockMixin",
+		"ShulkerBoxColoringRecipeMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
