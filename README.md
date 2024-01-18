@@ -8,4 +8,6 @@ Simply combine a shulker box with two dyes (instead of a single one) in your cra
 
 ![image](https://github.com/fabien-gigante/colored-shulker-boxes/assets/21187022/e01c3e11-a4e7-4c6a-8185-50ae1f014602)
 
+PS : The mod also includes a small unrelated eater egg to be discovered. Will you be able to find it ?
+
 <a href="https://fabricmc.net/"><img src="https://cdn.discordapp.com/attachments/705864145169416313/969720133998239794/fabric_supported.png" alt="Supported on Fabric" width="200"></a>           
