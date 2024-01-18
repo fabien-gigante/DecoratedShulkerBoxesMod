@@ -2,7 +2,7 @@
 # Colored Shulker Boxes
 Welcome to the *Colored Shulker Boxes* Minecraft mod.
 
-Too many shulker boxes in your inventory or ender chest ? Always confusing them ? Not enough colors available in vanilla to distinguish them easily ? Need to customize futher their appearance ? Look no further !
+Too many shulker boxes in your inventory or ender chest ? Always confusing them ? Not enough colors available in vanilla Minecraft to distinguish them easily ? Need to customize further their appearance ? Look no further !
 
 Simply combine a shulker box with two dyes (instead of a single one) in your craft. The resulting dyed shulker boxes will have both colors. The primary dye determines its lid color, the secondary dye its base color. That's it !
 
