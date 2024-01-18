@@ -28,7 +28,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntity implements 
 
 	public ShulkerBoxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) { super(type, pos, state); }
 
-	@Shadow 
+	@Shadow
 	public DyeColor getColor() { return null; }
 
 	@Override
@@ -46,7 +46,8 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntity implements 
 	}
 	@Override
 	public void writeNbtSecondaryColor(NbtCompound nbt) {
-		if (nbt != null) ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, this.secondaryColor);
+		if (nbt != null)
+			ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, this.secondaryColor);
 	}
 
 	@Inject(method = "readNbt", at = @At("TAIL"))

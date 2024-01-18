@@ -25,18 +25,23 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	@Shadow
 	private ShulkerEntityModel<?> model;
 
+	// Redirect the model rendering to only render the lid (and not the entire model)
+	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
+	private void renderLid(ShulkerEntityModel<?> model, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+		model.getLid().render(matrices, vertices, light, overlay, red, green, blue, alpha);
+	}
+	
+	// Then render the base separately, using the secondary color
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
 	private void renderBase(ShulkerBoxBlockEntity shulkerBoxBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
-		DyeColor secondaryColor = ((ShulkerBoxBlockEntityExt)shulkerBoxBlockEntity).getSecondaryColor();
-		SpriteIdentifier texture = secondaryColor != null ? TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId()): TexturedRenderLayers.SHULKER_TEXTURE_ID; 
+		DyeColor secondaryColor = ((ShulkerBoxBlockEntityExt) shulkerBoxBlockEntity).getSecondaryColor();
+		SpriteIdentifier texture = secondaryColor != null
+				? TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId())
+				: TexturedRenderLayers.SHULKER_TEXTURE_ID;
 		VertexConsumer vertexConsumer = texture.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntityCutoutNoCull);
 		ModelPart base = this.model.getParts().iterator().next();
 		base.render(matrixStack, vertexConsumer, i, j, 1.0F, 1.0F, 1.0F, 1.0F);
 	}
 
-	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
-	private void renderLid(ShulkerEntityModel<?> model, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-		model.getLid().render(matrices, vertices, light, overlay, red, green, blue, alpha);
-	}
 
 }

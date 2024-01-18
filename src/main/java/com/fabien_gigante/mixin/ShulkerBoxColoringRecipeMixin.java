@@ -28,42 +28,46 @@ import net.minecraft.world.World;
 @Mixin(ShulkerBoxColoringRecipe.class)
 public class ShulkerBoxColoringRecipeMixin {
 
+    // Helpers to search the recipe inventory for shulker box and dyes
     private static Stream<ItemStack> search(Inventory inventory, Predicate<ItemStack> condition) {
         return IntStream.range(0, inventory.size()).mapToObj(k -> inventory.getStack(k)).filter(condition);
     }
-
-    private static final Predicate<ItemStack> isShulker = (stack) -> Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock;
+    private static final Predicate<ItemStack> isShulkerBox = (stack) -> Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock;
     private static final Predicate<ItemStack> isDye = (stack) -> stack.getItem() instanceof DyeItem;
 
-     /** @reason Allow coloring with 2 dyes @author fabien **/
+    // Match recipes with exactly 1 shulker box and exactly 1 or 2 dyes
+    /** @reason using overwrite because behavior change not possible by simple code injection @author fabien **/
     @Overwrite
     public boolean matches(RecipeInputInventory recipeInputInventory, World world) {
-        long nShulkers = search(recipeInputInventory, isShulker).count();
-        if (nShulkers != 1) return false;
+        long nShulkerBoxes = search(recipeInputInventory, isShulkerBox).count();
         long nDyes = search(recipeInputInventory, isDye).count();
-        return nDyes == 1 || nDyes == 2;
+        return nShulkerBoxes == 1  && (nDyes == 1 || nDyes == 2);
     }
 
-    /** @reason Allow coloring with 2 dyes @author fabien **/
+    // Perform the dyed shulker box craft using the provided dyes
+    /** @reason using overwrite because behavior change not possible by simple code injection @author fabien **/
     @Overwrite
     public ItemStack craft(RecipeInputInventory recipeInputInventory, DynamicRegistryManager dynamicRegistryManager) {
-        ItemStack shulker = search(recipeInputInventory, isShulker).findFirst().orElse(ItemStack.EMPTY);
-        List<DyeColor> dyes =  search(recipeInputInventory, isDye).limit(2).map((stack)->((DyeItem)stack.getItem()).getColor()).toList();
-        DyeColor mainDye = dyes.size()>0 ? dyes.get(0) : DyeColor.WHITE;
-        DyeColor secondaryDye = dyes.size()>1 ? dyes.get(1) : null;
+        ItemStack shulkerBox = search(recipeInputInventory, isShulkerBox).findFirst().orElse(ItemStack.EMPTY);
+        List<DyeColor> dyes = search(recipeInputInventory, isDye).map((stack) -> ((DyeItem) stack.getItem()).getColor()).toList();
+        DyeColor primaryDye = dyes.size() > 0 ? dyes.get(0) : DyeColor.WHITE;
+        DyeColor secondaryDye = dyes.size() > 1 ? dyes.get(1) : null;
 
-        ItemStack craft = ShulkerBoxBlock.getItemStack(mainDye);
-        if (shulker.hasNbt()) craft.setNbt(shulker.getNbt().copy());
+        // Reproduce vanilla behavior
+        ItemStack dyedBox = ShulkerBoxBlock.getItemStack(primaryDye);
+        if (shulkerBox.hasNbt()) dyedBox.setNbt(shulkerBox.getNbt().copy());
 
-        NbtCompound nbt = BlockItem.getBlockEntityNbt(craft);
-        if (nbt != null) 
+        // Additional behavior for secondary color
+        NbtCompound nbt = BlockItem.getBlockEntityNbt(dyedBox);
+        if (nbt != null)
             ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, secondaryDye);
-        else if (secondaryDye != null) {
-            ShulkerBoxBlockEntity blockEntity = new ShulkerBoxBlockEntity(mainDye, BlockPos.ORIGIN, Blocks.SHULKER_BOX.getDefaultState());
-            ((ShulkerBoxBlockEntityExt)blockEntity).setSecondaryColor(secondaryDye);
-            blockEntity.setStackNbt(craft);
+        else if (secondaryDye != null && secondaryDye != primaryDye) {
+            ShulkerBoxBlockEntity blockEntity = new ShulkerBoxBlockEntity(primaryDye, BlockPos.ORIGIN, Blocks.SHULKER_BOX.getDefaultState());
+            ((ShulkerBoxBlockEntityExt) blockEntity).setSecondaryColor(secondaryDye);
+            blockEntity.setStackNbt(dyedBox);
         }
-        return craft;
+
+        return dyedBox;
     }
 
 }

@@ -31,14 +31,16 @@ public class BuiltinModelItemRendererMixin {
     @Shadow
     private BlockEntityRenderDispatcher blockEntityRenderDispatcher;
 
-	@Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
-	private void renderShulker(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
+    // Vanilla item renderer delegates shulker box item rending to the shulker box block entity renderer
+    // Slightly override this logic to set the secondary color on the block entity first
+    @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
+    private void renderShulkerBox(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
         Item item = stack.getItem();
         Block block = Block.getBlockFromItem(item);
         if (block instanceof ShulkerBoxBlock) {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
-            ((ShulkerBoxBlockEntityExt)blockEntity).readNbtSecondaryColor(BlockItem.getBlockEntityNbt(stack));
+            ((ShulkerBoxBlockEntityExt) blockEntity).readNbtSecondaryColor(BlockItem.getBlockEntityNbt(stack));
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
         }

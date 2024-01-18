@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import com.fabien_gigante.ShulkerBoxBlockEntityExt;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
@@ -21,12 +22,15 @@ import net.minecraft.loot.context.LootContextParameters;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
 
+    // Properly carry over the secondary color when a shulker box block is broken into a shulker box item
     @Inject(method = "getDroppedStacks", cancellable = true, at = @At("TAIL"))
-    private void getDroppedStacksWithBaseColor(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
+    private void getDroppedStacksWithSecondaryColor(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
         BlockEntity blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        List<ItemStack> stacks = ci.getReturnValue();
-        if (blockEntity instanceof ShulkerBoxBlockEntity && stacks.size() == 1) {
-            ((ShulkerBoxBlockEntityExt)blockEntity).writeNbtSecondaryColor(BlockItem.getBlockEntityNbt(stacks.get(0)));
+        if (blockEntity instanceof ShulkerBoxBlockEntity) {
+            List<ItemStack> stacks = ci.getReturnValue();
+            ItemStack stack = stacks.size() == 1 ? stacks.get(0) : null;
+            if (stack != null && Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock)
+                ((ShulkerBoxBlockEntityExt) blockEntity).writeNbtSecondaryColor(BlockItem.getBlockEntityNbt(stack));
         }
     }
 

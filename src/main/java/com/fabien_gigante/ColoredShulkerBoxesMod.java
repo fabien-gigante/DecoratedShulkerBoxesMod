@@ -17,7 +17,7 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
-    public static final Logger LOGGER = LoggerFactory.getLogger("fabien-mod");
+	public static final Logger LOGGER = LoggerFactory.getLogger("colored-shulker-boxes");
 
 	@Override
 	public void onInitialize() {
@@ -25,8 +25,9 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 
-		LOGGER.info("Shulker Mod starting...");
+		LOGGER.info("Colored Shulker Boxes - Mod starting...");
 
+		// Override cauldron behavior to also clean the secondary color of shulker boxes
 		CauldronBehavior CLEAN_SHULKER_BOX = ((state, world, pos, player, hand, stack) -> {
 			ActionResult ret = CauldronBehavior.CLEAN_SHULKER_BOX.interact(state, world, pos, player, hand, stack);
 			if (ret != ActionResult.PASS && !world.isClient) {
@@ -36,7 +37,8 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 			}
 			return ret;
 		});
-		Map<Item,CauldronBehavior> map = CauldronBehavior.WATER_CAULDRON_BEHAVIOR.map();
-		map.replaceAll( (item, behavior) -> behavior == CauldronBehavior.CLEAN_SHULKER_BOX ? CLEAN_SHULKER_BOX : behavior );
+		// Replace vanilla behavior by overriden behavior
+		Map<Item, CauldronBehavior> map = CauldronBehavior.WATER_CAULDRON_BEHAVIOR.map();
+		map.replaceAll((item, behavior) -> behavior == CauldronBehavior.CLEAN_SHULKER_BOX ? CLEAN_SHULKER_BOX : behavior);
 	}
 }
