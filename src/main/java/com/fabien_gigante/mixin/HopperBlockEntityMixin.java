@@ -18,16 +18,22 @@ import net.minecraft.world.World;
  @Mixin(HopperBlockEntity.class)
  public class HopperBlockEntityMixin {
 
+    // Maximum distance of an output inventory that can be reached by pipes
+    private static final int MAX_PIPE_EXTENSION = 16;
+
+    // Check if there is a corrected oriented pipe at the given position
     private static boolean isPipe(World world, BlockPos pos, Direction direction) {
         BlockState state = world.getBlockState(pos);
         return state != null && state.isOf(PipeBlock.PIPE) && state.get(PipeBlock.AXIS) == direction.getAxis();
     }
 
+    // Compute the hopper's output inventory taking into account extension pipes
+    /** @reason using overwrite because simpler than code injection @author fabien **/
     @Overwrite
     private static Inventory getOutputInventory(World world, BlockPos pos, BlockState state) {
         Direction direction = state.get(HopperBlock.FACING);
         BlockPos targetPos = pos;
-        for(int d = 0; d < 16; d++) {
+        for(int d = 0; d < MAX_PIPE_EXTENSION; d++) {
             targetPos = targetPos.offset(direction);
             if (!isPipe(world, targetPos, direction)) break;
         }
