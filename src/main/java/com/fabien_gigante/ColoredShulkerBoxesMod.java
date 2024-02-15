@@ -3,11 +3,16 @@ package com.fabien_gigante;
 import java.util.Map;
 
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.block.Blocks;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.ActionResult;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.block.cauldron.CauldronBehavior;
 
 import org.slf4j.Logger;
@@ -40,5 +45,10 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 		// Replace vanilla behavior by overriden behavior
 		Map<Item, CauldronBehavior> map = CauldronBehavior.WATER_CAULDRON_BEHAVIOR.map();
 		map.replaceAll((item, behavior) -> behavior == CauldronBehavior.CLEAN_SHULKER_BOX ? CLEAN_SHULKER_BOX : behavior);
+
+		// New pipe block
+		Blocks.register("pipe", PipeBlock.PIPE);
+		Items.register("pipe", new BlockItem(PipeBlock.PIPE, new FabricItemSettings()));
+		Registry.register(Registries.BLOCK_TYPE, "pipe", PipeBlock.CODEC);
 	}
 }

@@ -6,7 +6,8 @@
 		"IronGolemEntityMixin",
 		"ShulkerBoxBlockEntityMixin",
 		"ShulkerBoxBlockMixin",
-		"ShulkerBoxColoringRecipeMixin"
+		"ShulkerBoxColoringRecipeMixin",
+		"HopperBlockEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
