@@ -6,14 +6,15 @@ Too many shulker boxes in your inventory or ender chest ? Always confusing them 
 
 Simply combine a shulker box with two dyes (instead of a single one) in your craft. The resulting dyed shulker box will have both colors. The primary dye determines its lid color, the secondary dye its base color. That's it !
 
-![image](https://github.com/fabien-gigante/colored-shulker-boxes/assets/21187022/e01c3e11-a4e7-4c6a-8185-50ae1f014602)
+![colored shulker box](https://github.com/fabien-gigante/colored-shulker-boxes/assets/21187022/e01c3e11-a4e7-4c6a-8185-50ae1f014602)
 
 PS : The mod also includes a small unrelated easter egg to be discovered. Will you be able to find it ?
 
 # Experimental: Hopper Pipes
 
-Hopper's outputs can be extended using *Hopper Pipes*. 
+Hopper's outputs can be extended using *Hopper Pipes*. Arrange a copper ingot, an iron ingot and a copper ingot vertically to craft a pipe.
 
-Arange a copper ingot, an iron ingot and a copper ingot vertically to craft a pipe.
+![hopper_pipes](https://github.com/fabien-gigante/colored-shulker-boxes/assets/21187022/a60df25e-78b8-4dcc-99e4-e06a404cf84a)
+
 
 <a href="https://fabricmc.net/"><img src="https://cdn.discordapp.com/attachments/705864145169416313/969720133998239794/fabric_supported.png" alt="Supported on Fabric" width="200"></a>           
