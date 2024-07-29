@@ -8,7 +8,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -16,20 +15,21 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.fabien_gigante.SecondaryColorExt;
+import com.fabien_gigante.ShulkerBoxBlockEntityExt;
 
 @Mixin(ShulkerBoxBlockEntity.class)
-public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implements SecondaryColorExt {
+public abstract class ShulkerBoxBlockEntityMixin extends BlockEntity implements ShulkerBoxBlockEntityExt {
 	@Unique
 	private DyeColor secondaryColor = null;
 
-	private ShulkerBoxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {}
+	public ShulkerBoxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) { super(type, pos, state); }
 
 	@Shadow
-	public abstract DyeColor getColor(); // { return null; }
+	public DyeColor getColor() { return null; }
 
 	@Override
 	public DyeColor getSecondaryColor() {
@@ -41,31 +41,30 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implem
 	}
 
 	@Override
-	public boolean hasDistinctSecondaryColor() { return this.secondaryColor != null; }
-
-	@Override
 	public void readNbtSecondaryColor(NbtCompound nbt) {
-		this.secondaryColor = nbt == null ? null : SecondaryColorExt.getNbtSecondaryColor(nbt);
+		this.secondaryColor = nbt == null ? null : ShulkerBoxBlockEntityExt.getNbtSecondaryColor(nbt);
 	}
 	@Override
 	public void writeNbtSecondaryColor(NbtCompound nbt) {
 		if (nbt != null)
-			SecondaryColorExt.putNbtSecondaryColor(nbt, this.secondaryColor);
+			ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, this.secondaryColor);
 	}
 
-	@Override
-	protected void readNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) { readNbtSecondaryColor(nbt); }
+	@Inject(method = "readNbt", at = @At("TAIL"))
+	private void readNbtSecondaryColor(NbtCompound nbt, CallbackInfo ci) { readNbtSecondaryColor(nbt); }
+	@Inject(method = "writeNbt", at = @At("TAIL"))
+	private void writeNbtSecondaryColor(NbtCompound nbt, CallbackInfo ci) { writeNbtSecondaryColor(nbt); }
 
+	@Nullable
 	@Override
-	protected void writeNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) { writeNbtSecondaryColor(nbt); }
-
-	protected void toInitialChunkDataNbt(WrapperLookup lookup, CallbackInfoReturnable<NbtCompound> cir) {
-		NbtCompound nbt = cir.getReturnValue();
+	public Packet<ClientPlayPacketListener> toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create(this);
+	}
+	@Override
+	public NbtCompound toInitialChunkDataNbt() {
+		NbtCompound nbt = new NbtCompound();
 		writeNbtSecondaryColor(nbt);
-		cir.setReturnValue(nbt);
+		return nbt;
 	}
 
-    protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {
-		cir.setReturnValue(BlockEntityUpdateS2CPacket.create((BlockEntity)(Object)this));
-	}
 }
