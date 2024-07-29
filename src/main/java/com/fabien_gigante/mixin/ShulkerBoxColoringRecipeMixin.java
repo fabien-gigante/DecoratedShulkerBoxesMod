@@ -53,7 +53,7 @@ public class ShulkerBoxColoringRecipeMixin {
 
         // Reproduce vanilla behavior
         Block block = ShulkerBoxBlock.get(primaryColor);
-		var dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
+	ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
 
         // Additional behavior for secondary color
         NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(dyedBox);
