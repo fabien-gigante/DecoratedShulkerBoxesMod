@@ -14,10 +14,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContextParameterSet;
 import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.nbt.NbtCompound;
 
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
@@ -29,10 +29,8 @@ public class ShulkerBoxBlockMixin {
         if (blockEntity instanceof ShulkerBoxBlockEntity) {
             List<ItemStack> stacks = ci.getReturnValue();
             ItemStack stack = stacks.size() == 1 ? stacks.get(0) : null;
-            if (stack != null && Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) {
-                NbtCompound nbt = ShulkerBoxBlockEntityExt.getBlockEntityNbt(stack);
-                ((ShulkerBoxBlockEntityExt) blockEntity).writeNbtSecondaryColor(nbt);
-            }
+            if (stack != null && Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock)
+                ((ShulkerBoxBlockEntityExt) blockEntity).writeNbtSecondaryColor(BlockItem.getBlockEntityNbt(stack));
         }
     }
 

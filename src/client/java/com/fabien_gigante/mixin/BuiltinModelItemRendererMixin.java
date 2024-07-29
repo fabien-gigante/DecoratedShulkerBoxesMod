@@ -17,9 +17,9 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.DyeColor;
 
 @Mixin(BuiltinModelItemRenderer.class)
@@ -40,7 +40,8 @@ public class BuiltinModelItemRendererMixin {
         if (block instanceof ShulkerBoxBlock) {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
-            ((ShulkerBoxBlockEntityExt) blockEntity).readNbtSecondaryColor(BlockItem.getBlockEntityNbt(stack));
+            NbtCompound nbt = ShulkerBoxBlockEntityExt.getBlockEntityNbt(stack);
+            ((ShulkerBoxBlockEntityExt) blockEntity).readNbtSecondaryColor(nbt);
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
         }

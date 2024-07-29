@@ -1,8 +1,5 @@
 package com.fabien_gigante;
 
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.NbtComponent;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.DyeColor;
 
@@ -22,11 +19,4 @@ public interface ShulkerBoxBlockEntityExt {
 
 	public void readNbtSecondaryColor(NbtCompound nbt);
 	public void writeNbtSecondaryColor(NbtCompound nbt);
-
-	@SuppressWarnings("deprecation")
-	public static NbtCompound getBlockEntityNbt(ItemStack stack) {
-		NbtComponent component = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
-		return component != null ? component.getNbt() : null;
-	}
-
 }

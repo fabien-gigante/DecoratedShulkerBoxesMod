@@ -27,8 +27,8 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 
 	// Redirect the model rendering to only render the lid (and not the entire model)
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;IIFFFF)V"))
-	private void renderLid(ShulkerEntityModel<?> model, MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
-		model.getLid().render(matrices, vertices, light, overlay, red, green, blue, alpha);
+	private void renderLid(ShulkerEntityModel<?> model, MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
+		model.getLid().render(matrices, vertices, light, overlay);
 	}
 	
 	// Then render the base separately, using the secondary color
@@ -40,7 +40,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 				: TexturedRenderLayers.SHULKER_TEXTURE_ID;
 		VertexConsumer vertexConsumer = texture.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntityCutoutNoCull);
 		ModelPart base = this.model.getParts().iterator().next();
-		base.render(matrixStack, vertexConsumer, i, j, 1.0F, 1.0F, 1.0F, 1.0F);
+		base.render(matrixStack, vertexConsumer, i, j);
 	}
 
 

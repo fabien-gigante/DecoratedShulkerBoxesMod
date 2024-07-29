@@ -2,10 +2,10 @@ package com.fabien_gigante;
 
 import java.util.Map;
 
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ActionResult;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.cauldron.CauldronBehavior;
@@ -29,10 +29,10 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 
 		// Override cauldron behavior to also clean the secondary color of shulker boxes
 		CauldronBehavior CLEAN_SHULKER_BOX = ((state, world, pos, player, hand, stack) -> {
-			ItemActionResult ret = CauldronBehavior.CLEAN_SHULKER_BOX.interact(state, world, pos, player, hand, stack);
-			if (ret.toActionResult() != ActionResult.PASS && !world.isClient) {
+			ActionResult ret = CauldronBehavior.CLEAN_SHULKER_BOX.interact(state, world, pos, player, hand, stack);
+			if (ret != ActionResult.PASS && !world.isClient) {
 				ItemStack itemStack = player.getStackInHand(hand);
-                NbtCompound nbt = ShulkerBoxBlockEntityExt.getBlockEntityNbt(itemStack);
+				NbtCompound nbt = BlockItem.getBlockEntityNbt(itemStack);
 				if (nbt != null) ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, null);
 			}
 			return ret;
