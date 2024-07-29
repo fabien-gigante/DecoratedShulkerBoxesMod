@@ -32,8 +32,8 @@ public class ColoredShulkerBoxesMod implements ModInitializer {
 			ItemActionResult ret = CauldronBehavior.CLEAN_SHULKER_BOX.interact(state, world, pos, player, hand, stack);
 			if (ret.toActionResult() != ActionResult.PASS && !world.isClient) {
 				ItemStack itemStack = player.getStackInHand(hand);
-                NbtCompound nbt = ShulkerBoxBlockEntityExt.getBlockEntityNbt(itemStack);
-				if (nbt != null) ShulkerBoxBlockEntityExt.putNbtSecondaryColor(nbt, null);
+                NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(itemStack);
+				if (nbt != null) SecondaryColorExt.putNbtSecondaryColor(nbt, null);
 			}
 			return ret;
 		});

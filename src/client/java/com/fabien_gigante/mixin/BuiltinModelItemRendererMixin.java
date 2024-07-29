@@ -6,7 +6,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.fabien_gigante.ShulkerBoxBlockEntityExt;
+import com.fabien_gigante.BlockEntityExt;
+import com.fabien_gigante.SecondaryColorExt;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -40,8 +41,8 @@ public class BuiltinModelItemRendererMixin {
         if (block instanceof ShulkerBoxBlock) {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
-            NbtCompound nbt = ShulkerBoxBlockEntityExt.getBlockEntityNbt(stack);
-            ((ShulkerBoxBlockEntityExt) blockEntity).readNbtSecondaryColor(nbt);
+            NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(stack);
+            ((SecondaryColorExt) blockEntity).readNbtSecondaryColor(nbt);
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
         }
