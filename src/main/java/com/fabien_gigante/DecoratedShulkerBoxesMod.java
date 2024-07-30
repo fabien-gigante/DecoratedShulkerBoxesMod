@@ -33,12 +33,7 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 			if (ret.toActionResult() != ActionResult.PASS && !world.isClient) {
 				ItemStack itemStack = player.getStackInHand(hand);
                 NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(itemStack);
-				if (nbt != null) {
-					DecoratedShulkerBoxEntity.putNbtSecondaryColor(nbt, null);
-					//ItemStack item = DecoratedShulkerBoxEntity.getNbtDisplayedItem(nbt);
-					//if (item != null) player.dropItem(item, false);
-					DecoratedShulkerBoxEntity.putNbtDisplayedItem(nbt, null);
-				}
+				if (nbt != null) DecoratedShulkerBoxEntity.putNbtSecondaryColor(nbt, null);
 			}
 			return ret;
 		});
