@@ -1,6 +1,6 @@
 ![Icon](./src/main/resources/assets/icon.png)
-# Decored Shulker Boxes
-Welcome to the *Decored Shulker Boxes* Minecraft mod.
+# Decorated Shulker Boxes
+Welcome to the *Decorated Shulker Boxes* Minecraft mod.
 
 Too many shulker boxes in your inventory or ender chest ? Always confusing them ? Not enough colors available in vanilla Minecraft to distinguish them easily ? Need to customize further their appearance ? Look no further !
 
