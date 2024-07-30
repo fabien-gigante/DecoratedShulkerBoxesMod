@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import com.fabien_gigante.BlockEntityExt;
-import com.fabien_gigante.SecondaryColorExt;
+import com.fabien_gigante.DecoratedShulkerBoxEntity;
 import com.llamalad7.mixinextras.sugar.Local;
 
 import net.minecraft.block.Block;
@@ -30,13 +30,16 @@ import net.minecraft.world.World;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
 
-    private static void copySecondaryColor(BlockEntity blockEntity, ItemStack stack) {
-        if (!(blockEntity instanceof SecondaryColorExt shulker) || !shulker.hasDistinctSecondaryColor()) return;
+    private static void copyDecorationNbt(BlockEntity blockEntity, ItemStack stack) {
+        if (!(blockEntity instanceof DecoratedShulkerBoxEntity shulker) || !shulker.hasDecorations()) return;
         if (stack != null && Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) {
             NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(stack);
-            if (nbt == null) nbt = new NbtCompound();
-            shulker.writeNbtSecondaryColor(nbt);
-            BlockItem.setBlockEntityData(stack, BlockEntityType.SHULKER_BOX, nbt);
+            if (nbt != null) shulker.writeDecorationNbt(nbt);
+            else {
+                nbt = new NbtCompound();
+                shulker.writeDecorationNbt(nbt);
+                BlockItem.setBlockEntityData(stack, BlockEntityType.SHULKER_BOX, nbt);
+            }
         }
     }
 
@@ -44,13 +47,13 @@ public class ShulkerBoxBlockMixin {
     @Inject(method = "getDroppedStacks", cancellable = true, at = @At("TAIL"))
     private void getDroppedStacksWithSecondaryColor(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
         BlockEntity blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
-        for(ItemStack stack : ci.getReturnValue()) copySecondaryColor(blockEntity, stack);
+        for(ItemStack stack : ci.getReturnValue()) copyDecorationNbt(blockEntity, stack);
     }
 
     // Properly carry over the secondary color when a shulker box block is broken into a shulker box item (creative mode)
     @Inject(method = "onBreak", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;applyComponentsFrom(Lnet/minecraft/component/ComponentMap;)V"))
     private void onBreakWithSecondaryColor(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfoReturnable<BlockState> cir, @Local ShulkerBoxBlockEntity shulker, @Local ItemStack stack) {
-        copySecondaryColor(shulker, stack);
+        copyDecorationNbt(shulker, stack);
     }
 }
 

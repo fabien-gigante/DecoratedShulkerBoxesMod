@@ -1,8 +1,8 @@
 {
 	"schemaVersion": 1,
-	"id": "colored-shulker-boxes",
+	"id": "decorated-shulker-boxes",
 	"version": "${version}",
-	"name": "Colored Shulker Boxes",
+	"name": "Decorated Shulker Boxes",
 	"description": "Shulker boxes can be colored with two independant dyes for base and lid.",
 	"authors": ["Fabien Gigante"],
 	"contact": {
@@ -14,16 +14,16 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.fabien_gigante.ColoredShulkerBoxesMod"
+			"com.fabien_gigante.DecoratedShulkerBoxesMod"
 		],
 		"client": [
-			"com.fabien_gigante.ColoredShulkerBoxesModClient"
+			"com.fabien_gigante.DecoratedShulkerBoxesModClient"
 		]
 	},
 	"mixins": [
-		"ColoredShulkerBoxesMod.mixins.json",
+		"DecoratedShulkerBoxesMod.mixins.json",
 		{
-			"config": "ColoredShulkerBoxesMod.client.mixins.json",
+			"config": "DecoratedShulkerBoxesMod.client.mixins.json",
 			"environment": "client"
 		}
 	],

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.fabien_gigante.BlockEntityExt;
-import com.fabien_gigante.SecondaryColorExt;
+import com.fabien_gigante.DecoratedShulkerBoxEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -18,6 +18,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.render.model.json.ModelTransformationMode;
 import net.minecraft.client.util.math.MatrixStack;
+//import net.minecraft.component.ComponentMap;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -41,9 +42,12 @@ public class BuiltinModelItemRendererMixin {
         if (block instanceof ShulkerBoxBlock) {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
+            //blockEntity.setComponents(blockEntity.createComponentMap());
+            //blockEntity.readComponents(stack);
             NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(stack);
-            ((SecondaryColorExt) blockEntity).readNbtSecondaryColor(nbt);
+            ((DecoratedShulkerBoxEntity) blockEntity).readDecorationNbt(nbt);
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
+            //blockEntity.setComponents(ComponentMap.EMPTY);
             ci.cancel();
         }
     }

@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import com.fabien_gigante.BlockEntityExt;
-import com.fabien_gigante.SecondaryColorExt;
+import com.fabien_gigante.DecoratedShulkerBoxEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -42,7 +42,7 @@ public class ShulkerBoxColoringRecipeMixin {
         return (nDyes == 1 || nDyes == 2) && (input.getStackCount() == nShulkerBoxes + nDyes);
     }
 
-    // Perform the dyed shulker box craft using the provided dyes
+    // Perform the dyed shulker box craft using the provided dyes and optional extra item
     /** @reason using overwrite because behavior change not easy by simple code injection @author fabien **/
     @Overwrite
     public ItemStack craft(CraftingRecipeInput input, WrapperLookup wrapperLookup) {
@@ -53,14 +53,16 @@ public class ShulkerBoxColoringRecipeMixin {
 
         // Reproduce vanilla behavior
         Block block = ShulkerBoxBlock.get(primaryColor);
-	ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
+        ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
 
-        // Additional behavior for secondary color
+        // Additional behavior for secondary color and extra item
+        boolean hasDistinctSecondaryColor = (secondaryColor != null && secondaryColor != primaryColor);
         NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(dyedBox);
-        if (nbt == null && secondaryColor != null && secondaryColor != primaryColor) nbt = new NbtCompound();
-        SecondaryColorExt.putNbtSecondaryColor(nbt, secondaryColor != primaryColor ? secondaryColor : null);
-        BlockItem.setBlockEntityData(dyedBox, BlockEntityType.SHULKER_BOX, nbt);
-        
+        nbt = (nbt != null) ? nbt.copy() : hasDistinctSecondaryColor ? new NbtCompound() : null;
+        if (nbt != null) {
+            DecoratedShulkerBoxEntity.putNbtSecondaryColor(nbt, secondaryColor != primaryColor ? secondaryColor : null);
+            BlockItem.setBlockEntityData(dyedBox, BlockEntityType.SHULKER_BOX, nbt);
+        }
         return dyedBox;
     }
 
