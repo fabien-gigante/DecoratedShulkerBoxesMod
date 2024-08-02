@@ -10,6 +10,9 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.Text;
+import net.minecraft.text.HoverEvent.ItemStackContent;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -20,10 +23,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.fabien_gigante.DecoratedShulkerBoxEntity;
+import com.fabien_gigante.IDecoratedShulkerBox;
 
 @Mixin(ShulkerBoxBlockEntity.class)
-public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implements DecoratedShulkerBoxEntity {
+public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockEntityMixin implements IDecoratedShulkerBox {
 	@Unique
 	private DyeColor secondaryColor = null;
 	private ItemStack displayedItem = null;
@@ -32,6 +35,9 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implem
 
 	@Shadow
 	public abstract DyeColor getColor();
+
+	@Override
+	public boolean hasSecondaryColor() { return this.secondaryColor != null; }
 
 	@Override
 	public DyeColor getSecondaryColor() {
@@ -43,11 +49,18 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implem
 	}
 
 	@Override
-	public boolean hasDecorations() { return this.secondaryColor != null || displayedItem != null; }
+	public boolean hasDisplayedItem() { return displayedItem != null; }
 
 	@Override
 	public ItemStack getDisplayedItem() { 
-		return this.displayedItem; 
+		ItemStack displayedItem = this.displayedItem; 
+		if (displayedItem == null) {
+		    Text text = getCustomName();
+			HoverEvent hover = text != null ? text.getStyle().getHoverEvent() : null;
+			ItemStackContent content = hover != null ? hover.getValue(HoverEvent.Action.SHOW_ITEM) : null;
+			if (content != null) displayedItem = content.asStack();
+		}
+		return displayedItem;
 	}
 
 	@Override
@@ -55,16 +68,14 @@ public abstract class ShulkerBoxBlockEntityMixin extends BlockEntityMixin implem
 		this.displayedItem = stack;
 	 }
 
-	@Override
-	public void readDecorationNbt(NbtCompound nbt) {
-		this.secondaryColor = nbt == null ? null : DecoratedShulkerBoxEntity.getNbtSecondaryColor(nbt);
-		this.displayedItem = nbt == null ? null : DecoratedShulkerBoxEntity.getNbtDisplayedItem(nbt);
+	protected void readDecorationNbt(NbtCompound nbt) {
+		this.secondaryColor = nbt == null ? null : IDecoratedShulkerBox.getNbtSecondaryColor(nbt);
+		this.displayedItem = nbt == null ? null : IDecoratedShulkerBox.getNbtDisplayedItem(nbt);
 	}
-	@Override
-	public void writeDecorationNbt(NbtCompound nbt) {
+	protected void writeDecorationNbt(NbtCompound nbt) {
 		if (nbt != null) {
-			DecoratedShulkerBoxEntity.putNbtSecondaryColor(nbt, this.secondaryColor);
-			DecoratedShulkerBoxEntity.putNbtDisplayedItem(nbt, this.displayedItem);
+			IDecoratedShulkerBox.putNbtSecondaryColor(nbt, this.secondaryColor);
+			IDecoratedShulkerBox.putNbtDisplayedItem(nbt, this.displayedItem);
 		}
 	}
 

@@ -3,12 +3,16 @@
 	"package": "com.fabien_gigante.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"IronGolemEntityMixin",
 		"BlockEntityMixin",
+		"LockableContainerBlockEntityMixin",
 		"ShulkerBoxBlockEntityMixin",
 		"ShulkerBoxBlockMixin",
 		"ShulkerBoxColoringRecipeMixin",
-		"AnvilScreenHandlerMixin"
+		"AnvilScreenHandlerMixin",
+		"GrindstoneScreenHandlerMixin",
+		"GrindstoneScreenHandlerTopInputSlotMixin",
+		"GrindstoneScreenHandlerOutputSlotMixin",
+		"IronGolemEntityMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

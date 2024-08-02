@@ -6,16 +6,12 @@ import java.util.stream.Stream;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-import com.fabien_gigante.BlockEntityExt;
-import com.fabien_gigante.DecoratedShulkerBoxEntity;
+import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.recipe.ShulkerBoxColoringRecipe;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
@@ -56,13 +52,7 @@ public class ShulkerBoxColoringRecipeMixin {
         ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
 
         // Additional behavior for secondary color and extra item
-        boolean hasDistinctSecondaryColor = (secondaryColor != null && secondaryColor != primaryColor);
-        NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(dyedBox);
-        nbt = (nbt != null) ? nbt.copy() : hasDistinctSecondaryColor ? new NbtCompound() : null;
-        if (nbt != null) {
-            DecoratedShulkerBoxEntity.putNbtSecondaryColor(nbt, secondaryColor != primaryColor ? secondaryColor : null);
-            BlockItem.setBlockEntityData(dyedBox, BlockEntityType.SHULKER_BOX, nbt);
-        }
+        DecoratedShulkerBoxItemStack.create(dyedBox).setSecondaryColor(secondaryColor != primaryColor ? secondaryColor : null);
         return dyedBox;
     }
 
