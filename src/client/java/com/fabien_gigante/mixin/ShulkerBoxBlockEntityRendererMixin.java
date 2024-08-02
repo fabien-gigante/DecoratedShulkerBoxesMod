@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.fabien_gigante.DecoratedShulkerBoxEntity;
+import com.fabien_gigante.IDecoratedShulkerBox;
 
 @Mixin(ShulkerBoxBlockEntityRenderer.class)
 public abstract class ShulkerBoxBlockEntityRendererMixin {
@@ -38,9 +38,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
     @Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
     private void renderPost(ShulkerBoxBlockEntity shulker, float partialTick, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
         MinecraftClient minecraft = MinecraftClient.getInstance();
-		ItemStack stack = ((DecoratedShulkerBoxEntity)shulker).getDisplayedItem();
-		shulker.getCustomName();
-
+		ItemStack stack = ((IDecoratedShulkerBox)shulker).getDisplayedItem();
         if (stack != null) {
             ItemFrameEntity entity = new ItemFrameEntity((World)minecraft.world, shulker.getPos(), Direction.DOWN);
             entity.setHeldItemStack(stack, false);
@@ -66,7 +64,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	// Then render the base separately, using the secondary color
 	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
 	private void renderBase(ShulkerBoxBlockEntity shulkerBoxBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
-		DyeColor secondaryColor = ((DecoratedShulkerBoxEntity) shulkerBoxBlockEntity).getSecondaryColor();
+		DyeColor secondaryColor = ((IDecoratedShulkerBox) shulkerBoxBlockEntity).getSecondaryColor();
 		SpriteIdentifier texture = secondaryColor != null
 				? TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId())
 				: TexturedRenderLayers.SHULKER_TEXTURE_ID;
