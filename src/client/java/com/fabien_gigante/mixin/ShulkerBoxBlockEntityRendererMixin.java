@@ -1,6 +1,5 @@
 package com.fabien_gigante.mixin;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -14,8 +13,8 @@ import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 
@@ -23,6 +22,7 @@ import org.joml.Math;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -35,42 +35,42 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	@Shadow
 	private ShulkerEntityModel<?> model;
 
-    @Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
-    private void renderPost(ShulkerBoxBlockEntity shulker, float partialTick, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
-        MinecraftClient minecraft = MinecraftClient.getInstance();
-		ItemStack stack = ((IDecoratedShulkerBox)shulker).getDisplayedItem();
-        if (stack != null) {
-            ItemFrameEntity entity = new ItemFrameEntity((World)minecraft.world, shulker.getPos(), Direction.DOWN);
-            entity.setHeldItemStack(stack, false);
-            entity.setInvisible(true);
-            matrices.push();
-			float t = shulker.getAnimationProgress(partialTick);
-            float yOffset = 0.4375f - t / 2.0f;
-            if (stack.isOf(Items.FILLED_MAP)) yOffset += 0.039f;
-			matrices.translate(0,yOffset, 0);
-		 	if (!shulker.hasWorld()) matrices.scale(1.5f, 1.5f, 1.5f);
-			matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * t));
-            minecraft.getEntityRenderDispatcher().render((Entity)entity, 0.0, 0.0, 0.0, 0, partialTick, matrices, provider, light);
-            matrices.pop();
-		}
-    }
+	@Unique
+	private static final ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);
+	static { ITEM_FRAME_ENTITY.setSilent(true); ITEM_FRAME_ENTITY.setInvisible(true); }
 
-	// Redirect the model rendering to only render the lid (and not the entire model)
+ 	// Redirect the model rendering to only render the lid (and not the entire model)
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V"))
 	private void renderLid(ShulkerEntityModel<?> model, MatrixStack matrices, VertexConsumer vertices, int light, int overlay) {
 		model.getLid().render(matrices, vertices, light, overlay);
 	}
 	
 	// Then render the base separately, using the secondary color
-	@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/util/math/MatrixStack;pop()V"))
-	private void renderBase(ShulkerBoxBlockEntity shulkerBoxBlockEntity, float f, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, int j, CallbackInfo ci) {
-		DyeColor secondaryColor = ((IDecoratedShulkerBox) shulkerBoxBlockEntity).getSecondaryColor();
+    @Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
+	private void renderBase(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int i, int j, CallbackInfo ci) {
+		DyeColor secondaryColor = ((IDecoratedShulkerBox) shulker).getSecondaryColor();
 		SpriteIdentifier texture = secondaryColor != null
 				? TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId())
 				: TexturedRenderLayers.SHULKER_TEXTURE_ID;
-		VertexConsumer vertexConsumer = texture.getVertexConsumer(vertexConsumerProvider, RenderLayer::getEntityCutoutNoCull);
+		VertexConsumer vertexConsumer = texture.getVertexConsumer(provider, RenderLayer::getEntityCutoutNoCull);
 		ModelPart base = this.model.getParts().iterator().next();
-		base.render(matrixStack, vertexConsumer, i, j);
+		base.render(matrices, vertexConsumer, i, j);
 	}
+
+	// Finally, render the displayed item on top
+	@Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
+    private void renderDisplayedItem(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
+		ItemStack stack = ((IDecoratedShulkerBox)shulker).getDisplayedItem();
+        if (stack == null) return;
+		ITEM_FRAME_ENTITY.setHeldItemStack(stack, false);
+		matrices.push();
+		float λ = shulker.getAnimationProgress(f);
+		float yOffset = (stack.isOf(Items.FILLED_MAP) ? 7.625f : 7f) / 16f - λ / 2.0f;
+		matrices.translate(0, yOffset, 0);
+		if (!shulker.hasWorld()) matrices.scale(1.5f, 1.5f, 1.5f);
+		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * λ));
+		MinecraftClient.getInstance().getEntityRenderDispatcher().render(ITEM_FRAME_ENTITY, 0.0, 0.0, 0.0, 0, f, matrices, provider, light);
+		matrices.pop();
+    }
 
 }
