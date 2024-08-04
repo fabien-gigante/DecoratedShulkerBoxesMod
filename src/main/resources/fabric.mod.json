@@ -3,7 +3,7 @@
 	"id": "decorated-shulker-boxes",
 	"version": "${version}",
 	"name": "Decorated Shulker Boxes",
-	"description": "Shulker boxes can be colored with two independant dyes for base and lid.",
+	"description": "Shulker boxes can be colored with two independant dyes for base and lid and decorated with an arbitrary item.",
 	"authors": ["Fabien Gigante"],
 	"contact": {
 		"homepage": "https://github.com/fabien-gigante/decorated-shulker-boxes",

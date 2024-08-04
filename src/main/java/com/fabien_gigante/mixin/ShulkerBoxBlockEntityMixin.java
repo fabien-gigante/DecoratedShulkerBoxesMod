@@ -55,6 +55,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 	public ItemStack getDisplayedItem() { 
 		ItemStack displayedItem = this.displayedItem; 
 		if (displayedItem == null) {
+			// Fallback implementation
 		    Text text = getCustomName();
 			HoverEvent hover = text != null ? text.getStyle().getHoverEvent() : null;
 			ItemStackContent content = hover != null ? hover.getValue(HoverEvent.Action.SHOW_ITEM) : null;

@@ -1,13 +1,13 @@
 package com.fabien_gigante.mixin;
 
+import com.fabien_gigante.IDecoratedShulkerBox;
+import com.fabien_gigante.DecoratedShulkerBoxItemStack;
+
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import com.fabien_gigante.IDecoratedShulkerBox;
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
@@ -32,7 +32,7 @@ public class BuiltinModelItemRendererMixin {
     private BlockEntityRenderDispatcher blockEntityRenderDispatcher;
 
     // Vanilla item renderer delegates shulker box item rending to the shulker box block entity renderer
-    // Slightly override this logic to set the secondary color on the block entity first
+    // Slightly override this logic to set the decorations (secondary color and displayed item) on the block entity first
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private void renderShulkerBox(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
         Item item = stack.getItem();
@@ -40,7 +40,7 @@ public class BuiltinModelItemRendererMixin {
         if (block instanceof ShulkerBoxBlock) {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
-            blockEntity.readComponents(stack);
+            blockEntity.readComponents(stack); // only needed for fallback implementation (see ShulkerBoxBlockEntityMixin.getDisplayedItem)
             ((IDecoratedShulkerBox) blockEntity).setDecorations( DecoratedShulkerBoxItemStack.create(stack) );
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
