@@ -41,7 +41,7 @@ public class BuiltinModelItemRendererMixin {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
             blockEntity.readComponents(stack); // only needed for fallback implementation (see ShulkerBoxBlockEntityMixin.getDisplayedItem)
-            ((IDecoratedShulkerBox) blockEntity).setDecorations( DecoratedShulkerBoxItemStack.create(stack) );
+            ((IDecoratedShulkerBox) blockEntity).setDecorations( DecoratedShulkerBoxItemStack.from(stack) );
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
         }

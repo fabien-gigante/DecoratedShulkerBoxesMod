@@ -52,7 +52,7 @@ public class ShulkerBoxColoringRecipeMixin {
         ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
 
         // Additional behavior for secondary color and extra item
-        DecoratedShulkerBoxItemStack.create(dyedBox).setSecondaryColor(secondaryColor != primaryColor ? secondaryColor : null);
+        DecoratedShulkerBoxItemStack.from(dyedBox).setSecondaryColor(secondaryColor != primaryColor ? secondaryColor : null);
         return dyedBox;
     }
 

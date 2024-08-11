@@ -23,7 +23,7 @@ public abstract class GrindstoneScreenHandlerMixin implements IScreenHandlerOutp
         ItemStack returnValue = ci.getReturnValue();
         if (returnValue != ItemStack.EMPTY || !isShulkerBoxRecipe(firstInput, secondInput)) return;
         returnValue = firstInput.copy();
-        var decorated = DecoratedShulkerBoxItemStack.create(returnValue);
+        var decorated = DecoratedShulkerBoxItemStack.from(returnValue);
         decorated.setDisplayedItem(null);
         ci.setReturnValue(returnValue);
     }
@@ -32,14 +32,14 @@ public abstract class GrindstoneScreenHandlerMixin implements IScreenHandlerOutp
     public void onTakeOutput(PlayerEntity player, ItemStack stack) {
         ItemStack firstInput = input.getStack(0);
         if (isForgedShulkerBox(firstInput)) {
-            DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.create(firstInput);
+            DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.from(firstInput);
             ItemStack removedItem = shulker != null ? shulker.getDisplayedItem() : null;
             if (removedItem != null) player.dropItem(removedItem,false);
         }
     }
 
     private static boolean isForgedShulkerBox(ItemStack stack) {
-        var decorated = DecoratedShulkerBoxItemStack.create(stack);
+        var decorated = DecoratedShulkerBoxItemStack.from(stack);
         return decorated != null && decorated.hasDisplayedItem();
     }
 

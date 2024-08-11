@@ -3,8 +3,6 @@ package com.fabien_gigante;
 import java.util.Map;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.ItemActionResult;
 import net.minecraft.util.ActionResult;
 import net.minecraft.block.cauldron.CauldronBehavior;
@@ -15,9 +13,8 @@ public class DecoratedShulkerBoxCauldronBehavior {
 		CauldronBehavior CLEAN_SHULKER_BOX = ((state, world, pos, player, hand, stack) -> {
 			ItemActionResult ret = CauldronBehavior.CLEAN_SHULKER_BOX.interact(state, world, pos, player, hand, stack);
 			if (ret.toActionResult() != ActionResult.PASS && !world.isClient) {
-				ItemStack itemStack = player.getStackInHand(hand);
-                NbtCompound nbt = BlockEntityExt.getBlockEntityNbt(itemStack);
-				if (nbt != null) IDecoratedShulkerBox.putNbtSecondaryColor(nbt, null);
+				DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.from(player.getStackInHand(hand));
+				if (shulker != null) shulker.setSecondaryColor(null);
 			}
 			return ret;
 		});

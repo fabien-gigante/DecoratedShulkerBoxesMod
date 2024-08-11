@@ -18,7 +18,7 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
         return stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
     }
 
-    public static @Nullable DecoratedShulkerBoxItemStack create(ItemStack stack) {
+    public static @Nullable DecoratedShulkerBoxItemStack from(ItemStack stack) {
         return isShulkerBoxItemStack(stack) ? new DecoratedShulkerBoxItemStack(stack) : null;
     }
 

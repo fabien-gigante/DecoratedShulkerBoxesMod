@@ -17,7 +17,7 @@ public class GrindstoneScreenHandlerTopInputSlotMixin {
     }
 
     private static boolean isForgedShulkerBox(ItemStack stack) {
-        var decorated = DecoratedShulkerBoxItemStack.create(stack);
+        var decorated = DecoratedShulkerBoxItemStack.from(stack);
         return decorated != null && decorated.hasDisplayedItem();
     }    
 }

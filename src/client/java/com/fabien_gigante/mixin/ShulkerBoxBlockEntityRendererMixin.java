@@ -18,6 +18,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 
+import org.jetbrains.annotations.Nullable;
 import org.joml.Math;
 import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,8 +37,14 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	private ShulkerEntityModel<?> model;
 
 	@Unique
-	private static final ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);
-	static { ITEM_FRAME_ENTITY.setSilent(true); ITEM_FRAME_ENTITY.setInvisible(true); }
+	private static @Nullable ItemFrameEntity ITEM_FRAME_ENTITY = null;
+
+	@SuppressWarnings("resource")
+	@Unique
+	private void initItemFrame() {
+		ITEM_FRAME_ENTITY = new ItemFrameEntity(MinecraftClient.getInstance().world, BlockPos.ORIGIN, Direction.DOWN);
+		ITEM_FRAME_ENTITY.setSilent(true); ITEM_FRAME_ENTITY.setInvisible(true); 
+	}
 
  	// Redirect the model rendering to only render the lid (and not the entire model)
 	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V"))
@@ -62,15 +69,17 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
     private void renderDisplayedItem(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
 		ItemStack stack = ((IDecoratedShulkerBox)shulker).getDisplayedItem();
         if (stack == null) return;
+		if (ITEM_FRAME_ENTITY == null) initItemFrame();
 		ITEM_FRAME_ENTITY.setHeldItemStack(stack, false);
 		matrices.push();
 		float λ = shulker.getAnimationProgress(f);
-		float yOffset = (stack.isOf(Items.FILLED_MAP) ? 7.625f : 7f) / 16f - λ / 2.0f;
+		boolean isMap = stack.isOf(Items.FILLED_MAP);
+		float yOffset = (isMap ? 7.625f : 7f) / 16f - λ / 2.0f;
 		matrices.translate(0, yOffset, 0);
-		if (!shulker.hasWorld()) matrices.scale(1.5f, 1.5f, 1.5f);
+		if (!shulker.hasWorld() && !isMap) matrices.scale(1.5f, 1.5f, 1.5f);
 		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * λ));
 		MinecraftClient.getInstance().getEntityRenderDispatcher().render(ITEM_FRAME_ENTITY, 0.0, 0.0, 0.0, 0, f, matrices, provider, light);
-		matrices.pop();
+		matrices.pop();		
     }
 
 }
