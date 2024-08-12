@@ -32,9 +32,13 @@ public interface IDecoratedShulkerBox {
 	// Check shulker inventory content
 	public boolean isEmpty();
 
-	// Nbt helper functions for implementation classes
+	// Nbt helper functions for implementation classes : secondary color
+	
+	public static boolean hasNbtSecondaryColor(NbtCompound nbt) {
+		return nbt != null && nbt.contains(NBTKEY_SECONDARY_COLOR);
+	}
 	public static DyeColor getNbtSecondaryColor(NbtCompound nbt) {
-		if (nbt == null || !nbt.contains(NBTKEY_SECONDARY_COLOR)) return null;
+		if (!hasNbtSecondaryColor(nbt)) return null;
 		return DyeColor.byId(nbt.getInt(NBTKEY_SECONDARY_COLOR));
 	}
 	public static void putNbtSecondaryColor(NbtCompound nbt, DyeColor color) {
@@ -42,8 +46,13 @@ public interface IDecoratedShulkerBox {
 		else nbt.remove(NBTKEY_SECONDARY_COLOR);
 	}
 
+	// Nbt helper functions for implementation classes : displayed item
+
+	public static boolean hasNbtDisplayedItem(NbtCompound nbt) {
+		return nbt != null && nbt.contains(NBTKEY_DISPLAYED_ITEM);
+	}
 	public static ItemStack getNbtDisplayedItem(RegistryWrapper.WrapperLookup registries, NbtCompound nbt) {
-		if (nbt == null || !nbt.contains(NBTKEY_DISPLAYED_ITEM)) return null;
+		if (!hasNbtDisplayedItem(nbt)) return null;
 		return ItemStack.fromNbt(registries, nbt.get(NBTKEY_DISPLAYED_ITEM)).get();
 	}
 	public static void putNbtDisplayedItem(RegistryWrapper.WrapperLookup registries, NbtCompound nbt, ItemStack stack) {

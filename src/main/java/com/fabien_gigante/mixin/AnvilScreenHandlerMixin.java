@@ -42,7 +42,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
         if (!this.isValidShulkerBoxRecipe()) return;
         ItemStack forged = this.input.getStack(0).copy(), ingredient = this.input.getStack(1);
         if (ingredient != null && !ingredient.isEmpty())
-            DecoratedShulkerBoxItemStack.from(this.player.getWorld(), forged).setDisplayedItem(ingredient.copyWithCount(1));
+            DecoratedShulkerBoxItemStack.from(this.player, forged).setDisplayedItem(ingredient.copyWithCount(1));
         renameItem(forged);
         this.output.setStack(0, forged);
         this.levelCost.set(1);
@@ -65,7 +65,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
         if (!this.isValidShulkerBoxRecipe()) return;
         ItemStack ingredient = this.input.getStack(1);
         if (ingredient == null || ingredient.isEmpty()) return;
-        DecoratedShulkerBoxItemStack input = DecoratedShulkerBoxItemStack.from(player.getWorld(), this.input.getStack(0));
+        DecoratedShulkerBoxItemStack input = DecoratedShulkerBoxItemStack.from(player, this.input.getStack(0));
         ItemStack recovered = input != null ? input.getDisplayedItem() : null;
         if (recovered != null) player.dropItem(recovered,false);
     }
@@ -73,9 +73,9 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
     @Unique
     private boolean isValidShulkerBoxRecipe() {
         ItemStack forged = this.input.getStack(0), ingredient = this.input.getStack(1);
-        if (!DecoratedShulkerBoxItemStack.isShulkerBoxItemStack(forged)) return false;
+        if (!DecoratedShulkerBoxItemStack.isShulkerBox(forged)) return false;
         // Avoid some forms of recursion
-        var decoration = DecoratedShulkerBoxItemStack.from(player.getWorld(), ingredient);
+        var decoration = DecoratedShulkerBoxItemStack.from(player, ingredient);
         return decoration == null || (!decoration.hasDisplayedItem() && decoration.isEmpty());
     }
 }

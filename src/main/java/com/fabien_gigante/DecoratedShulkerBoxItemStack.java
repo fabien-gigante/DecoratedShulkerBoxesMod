@@ -7,6 +7,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -18,31 +19,39 @@ import net.minecraft.world.World;
 public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
     WrapperLookup registries;
     ItemStack stack;
+
     private DecoratedShulkerBoxItemStack(WrapperLookup registries, ItemStack stack) {  this.registries = registries; this.stack = stack; }
-    public ItemStack getItemStack() { return this.stack; }
 
-    
-    public static boolean isShulkerBoxItemStack(ItemStack stack) {
-        return stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
-    }
-
+    // Construction
     public static @Nullable DecoratedShulkerBoxItemStack from(WrapperLookup registries, ItemStack stack) {
-        return isShulkerBoxItemStack(stack) ? new DecoratedShulkerBoxItemStack(registries, stack) : null;
+        return isShulkerBox(stack) ? new DecoratedShulkerBoxItemStack(registries, stack) : null;
     }
     public static @Nullable DecoratedShulkerBoxItemStack from(World world, ItemStack stack) {
         return from(world.getRegistryManager(), stack);
     }
+    public static @Nullable DecoratedShulkerBoxItemStack from(Entity entity, ItemStack stack) {
+        return from(entity.getWorld(), stack);
+    }
 
+    // Return the underlying ItemStack
+    public ItemStack getItemStack() { return this.stack; }
+
+    // Helper function to check if an ItemStack is a shulker box
+    public static boolean isShulkerBox(ItemStack stack) {
+        return stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() instanceof ShulkerBoxBlock;
+    }
+
+    // Helper method to get the nbt of the block entity data component
 	@SuppressWarnings("deprecation")
 	private NbtCompound getBlockEntityData() {
 		NbtComponent component = stack.get(DataComponentTypes.BLOCK_ENTITY_DATA);
 		return component != null ? component.getNbt() : null;
-	}    
+	}
+    
+    // Implements IDecoratedShulkerBox : for secondary color
 
-    public DyeColor getSecondaryColor() {
-        NbtCompound nbt = getBlockEntityData();
-        return IDecoratedShulkerBox.getNbtSecondaryColor(nbt);
-    }
+    public boolean hasSecondaryColor() {  return IDecoratedShulkerBox.hasNbtSecondaryColor(getBlockEntityData()); }
+    public DyeColor getSecondaryColor() { return IDecoratedShulkerBox.getNbtSecondaryColor(getBlockEntityData()); }
 
     public void setSecondaryColor(DyeColor color) {
         NbtCompound nbt = getBlockEntityData();
@@ -53,10 +62,10 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
         }
     }
 
-    public ItemStack getDisplayedItem() {
-        NbtCompound nbt = getBlockEntityData();
-        return IDecoratedShulkerBox.getNbtDisplayedItem(this.registries, nbt);
-    }
+    // Implements IDecoratedShulkerBox : for displayed item
+
+    public boolean hasDisplayedItem() { return IDecoratedShulkerBox.hasNbtDisplayedItem(getBlockEntityData()); }
+    public ItemStack getDisplayedItem() { return IDecoratedShulkerBox.getNbtDisplayedItem(this.registries, getBlockEntityData()); }
 
     public void setDisplayedItem(ItemStack displayedItem) {
         if (displayedItem != null && displayedItem.isEmpty()) displayedItem = null;
@@ -68,12 +77,9 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
         }
     }
 
-    public boolean hasSecondaryColor() {  return getSecondaryColor()!=null; }
-
-    public boolean hasDisplayedItem() { return getDisplayedItem()!=null; }
-
+    // Implements IDecoratedShulkerBox : for inventory
     public boolean isEmpty() {
         ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
-        return (container == null || !container.streamNonEmpty().findAny().isPresent() );
+        return (container == null || !container.iterateNonEmpty().iterator().hasNext() );
     }
 }
