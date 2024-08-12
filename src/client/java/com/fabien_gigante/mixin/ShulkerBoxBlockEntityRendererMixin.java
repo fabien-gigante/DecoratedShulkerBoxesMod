@@ -14,7 +14,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -73,5 +72,4 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 		MinecraftClient.getInstance().getEntityRenderDispatcher().render(ITEM_FRAME_ENTITY, 0.0, 0.0, 0.0, 0, f, matrices, provider, light);
 		matrices.pop();
     }
-
 }
