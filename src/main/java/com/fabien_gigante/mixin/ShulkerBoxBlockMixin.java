@@ -3,6 +3,7 @@ package com.fabien_gigante.mixin;
 import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,9 +27,10 @@ import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
 
+    @Unique
     private static void copyDecorations(BlockEntity blockEntity, ItemStack stack) {
         if (!(blockEntity instanceof IDecoratedShulkerBox source) || !source.hasDecorations()) return;
-        var target = DecoratedShulkerBoxItemStack.from(stack);
+        var target = DecoratedShulkerBoxItemStack.from(blockEntity.getWorld(), stack);
         if (target != null); target.setDecorations(source);
     }
 

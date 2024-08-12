@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+// Avoid overrides using mixin inheritance
 @Mixin(BlockEntity.class)
 public abstract class BlockEntityMixin  {
 	@Inject(method = "readNbt", at = @At("TAIL"))

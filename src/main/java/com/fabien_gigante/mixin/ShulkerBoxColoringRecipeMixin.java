@@ -3,7 +3,9 @@ package com.fabien_gigante.mixin;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import com.fabien_gigante.DecoratedShulkerBoxItemStack;
@@ -22,10 +24,13 @@ import net.minecraft.world.World;
 public class ShulkerBoxColoringRecipeMixin {
 
     // Helpers to search the recipe inventory for shulker box and dyes
+    @Unique
     private static Stream<ItemStack> search(CraftingRecipeInput input, Predicate<ItemStack> condition) {
         return input.getStacks().stream().filter(condition);
     }
+    @Unique
     private static final Predicate<ItemStack> isShulkerBox = (stack) -> Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock;
+    @Unique
     private static final Predicate<ItemStack> isDye = (stack) -> stack.getItem() instanceof DyeItem;
 
     // Match recipes with exactly 1 shulker box and exactly 1 or 2 dyes
@@ -52,7 +57,7 @@ public class ShulkerBoxColoringRecipeMixin {
         ItemStack dyedBox = shulkerBox.copyComponentsToNewStack(block, 1);
 
         // Additional behavior for secondary color and extra item
-        DecoratedShulkerBoxItemStack.from(dyedBox).setSecondaryColor(secondaryColor != primaryColor ? secondaryColor : null);
+        DecoratedShulkerBoxItemStack.from(wrapperLookup, dyedBox).setSecondaryColor(secondaryColor != primaryColor ? secondaryColor : null);
         return dyedBox;
     }
 

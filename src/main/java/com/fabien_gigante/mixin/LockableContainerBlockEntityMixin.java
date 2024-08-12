@@ -6,6 +6,7 @@ import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+// For mixin inheritance
 @Mixin(LockableContainerBlockEntity.class)
 public abstract class LockableContainerBlockEntityMixin extends BlockEntityMixin {
     @Shadow
