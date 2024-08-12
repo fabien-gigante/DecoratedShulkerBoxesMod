@@ -3,6 +3,7 @@ package com.fabien_gigante.mixin;
 import java.util.List;
 
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -26,22 +27,23 @@ import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 @Mixin(ShulkerBoxBlock.class)
 public class ShulkerBoxBlockMixin {
 
+    @Unique
     private static void copyDecorations(BlockEntity blockEntity, ItemStack stack) {
         if (!(blockEntity instanceof IDecoratedShulkerBox source) || !source.hasDecorations()) return;
-        var target = DecoratedShulkerBoxItemStack.create(stack);
+        var target = DecoratedShulkerBoxItemStack.from(blockEntity.getWorld(), stack);
         if (target != null); target.setDecorations(source);
     }
 
     // Properly carry over the secondary color when a shulker box block is broken into a shulker box item (survial mode)
     @Inject(method = "getDroppedStacks", cancellable = true, at = @At("TAIL"))
-    private void getDroppedStacksWithSecondaryColor(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
+    private void getDroppedStacksWithDecorations(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
         BlockEntity blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
         for(ItemStack stack : ci.getReturnValue()) copyDecorations(blockEntity, stack);
     }
 
     // Properly carry over the secondary color when a shulker box block is broken into a shulker box item (creative mode)
     @Inject(method = "onBreak", locals = LocalCapture.CAPTURE_FAILHARD, at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemStack;applyComponentsFrom(Lnet/minecraft/component/ComponentMap;)V"))
-    private void onBreakWithSecondaryColor(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfoReturnable<BlockState> cir, @Local ShulkerBoxBlockEntity shulker, @Local ItemStack stack) {
+    private void onBreakWithDecorations(World world, BlockPos pos, BlockState state, PlayerEntity player, CallbackInfoReturnable<BlockState> cir, @Local ShulkerBoxBlockEntity shulker, @Local ItemStack stack) {
         copyDecorations(shulker, stack);
     }
 }

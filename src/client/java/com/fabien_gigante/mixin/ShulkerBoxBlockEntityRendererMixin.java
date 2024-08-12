@@ -1,6 +1,7 @@
 package com.fabien_gigante.mixin;
 
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumer;
@@ -9,14 +10,14 @@ import net.minecraft.client.render.block.entity.ShulkerBoxBlockEntityRenderer;
 import net.minecraft.client.render.entity.model.ShulkerEntityModel;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
+
 import net.minecraft.entity.decoration.ItemFrameEntity;
+import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.model.ModelPart;
 
 import org.joml.Math;
 import org.joml.Quaternionf;
@@ -36,7 +37,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	private ShulkerEntityModel<?> model;
 
 	@Unique
-	private static final ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);
+	private static ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);
 	static { ITEM_FRAME_ENTITY.setSilent(true); ITEM_FRAME_ENTITY.setInvisible(true); }
 
  	// Redirect the model rendering to only render the lid (and not the entire model)
@@ -65,7 +66,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 		ITEM_FRAME_ENTITY.setHeldItemStack(stack, false);
 		matrices.push();
 		float λ = shulker.getAnimationProgress(f);
-		float yOffset = (stack.isOf(Items.FILLED_MAP) ? 7.625f : 7f) / 16f - λ / 2.0f;
+		float yOffset = 7f / 16f - λ / 2f;
 		matrices.translate(0, yOffset, 0);
 		if (!shulker.hasWorld()) matrices.scale(1.5f, 1.5f, 1.5f);
 		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * λ));

@@ -1,6 +1,7 @@
 package com.fabien_gigante.mixin;
 
 import com.fabien_gigante.IDecoratedShulkerBox;
+import net.minecraft.client.MinecraftClient;
 import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,6 +34,7 @@ public class BuiltinModelItemRendererMixin {
 
     // Vanilla item renderer delegates shulker box item rending to the shulker box block entity renderer
     // Slightly override this logic to set the decorations (secondary color and displayed item) on the block entity first
+    @SuppressWarnings("resource")
     @Inject(method = "render", at = @At(value = "HEAD"), cancellable = true)
     private void renderShulkerBox(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, CallbackInfo ci) {
         Item item = stack.getItem();
@@ -41,7 +43,7 @@ public class BuiltinModelItemRendererMixin {
             DyeColor dyeColor = ShulkerBoxBlock.getColor(item);
             BlockEntity blockEntity = dyeColor == null ? RENDER_SHULKER_BOX : RENDER_SHULKER_BOX_DYED[dyeColor.getId()];
             blockEntity.readComponents(stack); // only needed for fallback implementation (see ShulkerBoxBlockEntityMixin.getDisplayedItem)
-            ((IDecoratedShulkerBox) blockEntity).setDecorations( DecoratedShulkerBoxItemStack.create(stack) );
+            ((IDecoratedShulkerBox) blockEntity).setDecorations( DecoratedShulkerBoxItemStack.from(MinecraftClient.getInstance().world, stack) );
             this.blockEntityRenderDispatcher.renderEntity(blockEntity, matrices, vertexConsumers, light, overlay);
             ci.cancel();
         }

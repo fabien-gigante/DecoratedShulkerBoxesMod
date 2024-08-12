@@ -10,14 +10,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.fabien_gigante.IScreenHandlerOutputListener;
+import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(targets = "net/minecraft/screen/GrindstoneScreenHandler$4")
 public class GrindstoneScreenHandlerOutputSlotMixin {
     @Shadow @Final GrindstoneScreenHandler field_16780;
 
+    // Call back to the parent (similar to what the Anvil does in vanilla)
     @Inject(method = "onTakeItem", at = @At(value = "HEAD"))
     private void onTakeItem(PlayerEntity player, ItemStack resultStack, CallbackInfo ci) {
-        ((IScreenHandlerOutputListener)field_16780).onTakeOutput(player, resultStack);
+        ((IScreenHandlerSlotListener)field_16780).onTakeOutput(player, resultStack);
     }
 }
