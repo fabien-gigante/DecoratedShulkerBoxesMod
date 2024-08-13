@@ -11,6 +11,7 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringHelper;
+
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -65,9 +66,8 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
         if (!this.isValidShulkerBoxRecipe()) return;
         ItemStack ingredient = this.input.getStack(1);
         if (ingredient == null || ingredient.isEmpty()) return;
-        DecoratedShulkerBoxItemStack input = DecoratedShulkerBoxItemStack.from(player, this.input.getStack(0));
-        ItemStack recovered = input != null ? input.getDisplayedItem() : null;
-        if (recovered != null) player.dropItem(recovered,false);
+        DecoratedShulkerBoxItemStack inputShulker = DecoratedShulkerBoxItemStack.from(player, this.input.getStack(0));
+        if (inputShulker != null) this.context.run((world,pos) -> inputShulker.dropDisplayedItem(world, pos, player));
     }
 
     @Unique

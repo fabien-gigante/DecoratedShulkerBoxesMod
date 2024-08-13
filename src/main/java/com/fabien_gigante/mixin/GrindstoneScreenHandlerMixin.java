@@ -18,6 +18,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import com.fabien_gigante.DecoratedShulkerBoxItemStack;
 import com.fabien_gigante.IScreenHandlerSlotListener;
 
@@ -25,6 +26,7 @@ import com.fabien_gigante.IScreenHandlerSlotListener;
 public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler implements IScreenHandlerSlotListener {
     @Shadow @Final Inventory input;
     @Unique PlayerEntity player;
+    @Shadow @Final ScreenHandlerContext context;    
 
     protected GrindstoneScreenHandlerMixin(ScreenHandlerType<?> type, int syncId) {
         super(type, syncId);
@@ -32,7 +34,7 @@ public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler impleme
 
     // Locally cache the player (as Anvil does)
     @Inject(method = "<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V", at = @At("TAIL"))
-    private void onInit(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context, CallbackInfo info) {
+    private void onInit(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, CallbackInfo info) {
         this.player = playerInventory.player;
     }
 
@@ -57,8 +59,7 @@ public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler impleme
         ItemStack firstInput = input.getStack(0);
         if (isForgedShulkerBox(firstInput)) {
             DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.from(player, firstInput);
-            ItemStack removedItem = shulker != null ? shulker.getDisplayedItem() : null;
-            if (removedItem != null) player.dropItem(removedItem,false);
+            if (shulker != null) this.context.run((world,pos) -> shulker.dropDisplayedItem(world, pos, player));
         }
     }
 

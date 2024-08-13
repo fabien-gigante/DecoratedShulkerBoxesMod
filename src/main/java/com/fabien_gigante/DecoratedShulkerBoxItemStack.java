@@ -8,11 +8,15 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.component.type.NbtComponent;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 // ItemStack wrapper for decorated shulker box item stack
@@ -81,5 +85,15 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
     public boolean isEmpty() {
         ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
         return (container == null || !container.iterateNonEmpty().iterator().hasNext() );
+    }
+
+    // Drops the displayed item (if any) to the ground towards the player
+    public void dropDisplayedItem(World world, BlockPos from, PlayerEntity player) {
+        if (!hasDisplayedItem()) return;
+        Vec3d vec = from.toCenterPos(), dir = player.getEyePos().subtract(vec).normalize();
+        vec = vec.add(dir.multiply(.75)); dir = dir.multiply(.05).add(0,.1,0);
+        var entity = new ItemEntity(world, vec.x, vec.y, vec.z, getDisplayedItem(), dir.x, dir.y, dir.z);
+        entity.setToDefaultPickupDelay();
+        world.spawnEntity(entity);
     }
 }
