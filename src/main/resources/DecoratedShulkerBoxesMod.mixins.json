@@ -11,8 +11,7 @@
 		"AnvilScreenHandlerMixin",
 		"GrindstoneScreenHandlerMixin",
 		"GrindstoneScreenHandlerTopInputSlotMixin",
-		"GrindstoneScreenHandlerOutputSlotMixin",
-		"IronGolemEntityMixin"
+		"GrindstoneScreenHandlerOutputSlotMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
