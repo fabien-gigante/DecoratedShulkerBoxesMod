@@ -12,6 +12,9 @@ public interface IDecoratedShulkerBox {
 
 	public default boolean hasDecorations() { return hasSecondaryColor() || hasDisplayedItem(); }
 
+	// Primary colo accessor
+	public DyeColor getColor();
+
 	// Secondary color accessors
 	public boolean hasSecondaryColor();
 	public DyeColor getSecondaryColor();
@@ -24,9 +27,8 @@ public interface IDecoratedShulkerBox {
 
 	// Combined setter for easy copy
 	public default void setDecorations(IDecoratedShulkerBox source) { 
-		if (source == null) return;
-		setSecondaryColor(source.getSecondaryColor());
-		setDisplayedItem(source.getDisplayedItem());
+		setSecondaryColor(source != null ? source.getSecondaryColor() : null);
+		setDisplayedItem(source != null ? source.getDisplayedItem() : null);
 	}
 
 	// Check shulker inventory content

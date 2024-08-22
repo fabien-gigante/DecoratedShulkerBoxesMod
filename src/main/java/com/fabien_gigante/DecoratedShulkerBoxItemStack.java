@@ -54,10 +54,15 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
     
     // Implements IDecoratedShulkerBox : for secondary color
 
+	public DyeColor getColor() {
+        return ShulkerBoxBlock.getColor(this.stack.getItem());
+    }
+
     public boolean hasSecondaryColor() {  return IDecoratedShulkerBox.hasNbtSecondaryColor(getBlockEntityData()); }
     public DyeColor getSecondaryColor() { return IDecoratedShulkerBox.getNbtSecondaryColor(getBlockEntityData()); }
 
     public void setSecondaryColor(DyeColor color) {
+        if (color == getColor()) color = null;
         NbtCompound nbt = getBlockEntityData();
         nbt = (nbt != null) ? nbt.copy() : (color != null) ? new NbtCompound() : null;
         if (nbt != null) {
