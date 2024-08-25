@@ -22,9 +22,9 @@ public abstract class BlockEntityMixin  {
 	@Inject(method = "writeNbt", at = @At("TAIL"))
 	protected void writeNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) {}
 
-    @Inject(method = "toInitialChunkDataNbt", at = @At("TAIL"), cancellable = true)
-    protected void toInitialChunkDataNbt(WrapperLookup lookup, CallbackInfoReturnable<NbtCompound> cir) {}
+	@Inject(method = "toInitialChunkDataNbt", at = @At("TAIL"), cancellable = true)
+	protected void toInitialChunkDataNbt(WrapperLookup lookup, CallbackInfoReturnable<NbtCompound> cir) {}
 
-    @Inject(method = "toUpdatePacket", at = @At("TAIL"), cancellable = true)
-    protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {}
+	@Inject(method = "toUpdatePacket", at = @At("TAIL"), cancellable = true)
+	protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {}
 }

@@ -14,11 +14,11 @@ import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(targets = "net/minecraft/screen/GrindstoneScreenHandler$4")
 public class GrindstoneScreenHandlerOutputSlotMixin {
-    @Shadow @Final GrindstoneScreenHandler field_16780;
+	@Shadow @Final GrindstoneScreenHandler field_16780;
 
-    // Call back to the parent (similar to what the Anvil does in vanilla)
-    @Inject(method = "onTakeItem", at = @At(value = "HEAD"))
-    private void onTakeItem(PlayerEntity player, ItemStack resultStack, CallbackInfo ci) {
-        ((IScreenHandlerSlotListener)field_16780).onTakeOutput(player, resultStack);
-    }
+	// Call back to the parent (similar to what the Anvil does in vanilla)
+	@Inject(method = "onTakeItem", at = @At(value = "HEAD"))
+	private void onTakeItem(PlayerEntity player, ItemStack resultStack, CallbackInfo ci) {
+		((IScreenHandlerSlotListener)field_16780).onTakeOutput(player, resultStack);
+	}
 }

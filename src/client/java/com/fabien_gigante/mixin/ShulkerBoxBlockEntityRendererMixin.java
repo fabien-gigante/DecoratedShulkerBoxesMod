@@ -46,7 +46,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 	}
 	
 	// Then render the base separately, using the secondary color
-    @Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
+	@Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
 	private void renderBase(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int i, int j, CallbackInfo ci) {
 		DyeColor secondaryColor = ((IDecoratedShulkerBox) shulker).getSecondaryColor();
 		SpriteIdentifier texture = secondaryColor != null
@@ -59,9 +59,9 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 
 	// Finally, render the displayed item on top
 	@Inject(method="render", at=@At(value="INVOKE", target="Lnet/minecraft/client/render/entity/model/ShulkerEntityModel;render(Lnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumer;II)V", shift=At.Shift.AFTER))
-    private void renderDisplayedItem(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
+	private void renderDisplayedItem(ShulkerBoxBlockEntity shulker, float f, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, CallbackInfo ci) {
 		ItemStack stack = ((IDecoratedShulkerBox)shulker).getDisplayedItem();
-        if (stack == null) return;
+		if (stack == null) return;
 		ITEM_FRAME_ENTITY.setHeldItemStack(stack, false);
 		matrices.push();
 		float λ = shulker.getAnimationProgress(f);
@@ -71,5 +71,5 @@ public abstract class ShulkerBoxBlockEntityRendererMixin {
 		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * λ));
 		MinecraftClient.getInstance().getEntityRenderDispatcher().render(ITEM_FRAME_ENTITY, 0.0, 0.0, 0.0, 0, f, matrices, provider, light);
 		matrices.pop();
-    }
+	}
 }

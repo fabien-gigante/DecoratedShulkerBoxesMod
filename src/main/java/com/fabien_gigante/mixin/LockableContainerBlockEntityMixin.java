@@ -9,6 +9,6 @@ import org.spongepowered.asm.mixin.Shadow;
 // For mixin inheritance
 @Mixin(LockableContainerBlockEntity.class)
 public abstract class LockableContainerBlockEntityMixin extends BlockEntityMixin {
-    @Shadow
-    public abstract Text getCustomName();
+	@Shadow
+	public abstract Text getCustomName();
 }
