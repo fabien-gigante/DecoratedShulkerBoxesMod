@@ -55,7 +55,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 		ItemStack displayedItem = this.displayedItem; 
 		if (displayedItem == null) {
 			// Fallback implementation (mod used as client only, with server plugin setting the hover show item)
-		    Text text = getCustomName();
+			Text text = getCustomName();
 			HoverEvent hover = text != null ? text.getStyle().getHoverEvent() : null;
 			ItemStackContent content = hover != null ? hover.getValue(HoverEvent.Action.SHOW_ITEM) : null;
 			if (content != null) displayedItem = content.asStack();
@@ -92,7 +92,7 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 		writeDecorationNbt(lookup, cir.getReturnValue());
 	}
 	@Override
-    protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {
+	protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {
 		cir.setReturnValue(BlockEntityUpdateS2CPacket.create((BlockEntity)(Object)this));
 	}
 }
