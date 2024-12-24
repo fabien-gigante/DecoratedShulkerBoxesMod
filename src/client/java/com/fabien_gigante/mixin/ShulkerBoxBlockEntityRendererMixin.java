@@ -77,8 +77,8 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		matrices.pop();
 	}
 
-	@Overwrite
 	/** @reason using overwrite because behavior change not easy by simple code injection @author fabien **/
+	@Overwrite
 	public void render(ShulkerBoxBlockEntity shulker, float delta, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay) {
 		Direction facing = (Direction)shulker.getCachedState().get(ShulkerBoxBlock.FACING, Direction.UP);
 		DyeColor dyeColor = shulker.getColor();
