@@ -9,6 +9,7 @@ import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.Property;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
+import net.minecraft.screen.slot.ForgingSlotsManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringHelper;
 
@@ -33,10 +34,10 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
 	@Shadow @Nullable
 	private String newItemName;
 
-	public AnvilScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context) {
-		super(type, syncId, playerInventory, context);
+	public AnvilScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
+		super(type, syncId, playerInventory, context, forgingSlotsManager);
 	}
-
+   
 	// Produce a decorated shulker box when possible
 	@Inject(method={"updateResult"}, at={@At(value="HEAD")}, cancellable=true)
 	public void updateResult(CallbackInfo ci) {

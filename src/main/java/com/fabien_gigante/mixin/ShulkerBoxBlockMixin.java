@@ -16,7 +16,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.context.LootContextParameterSet;
+import net.minecraft.loot.context.LootWorldContext;
 import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -36,7 +36,7 @@ public class ShulkerBoxBlockMixin {
 
 	// Properly carry over the secondary color when a shulker box block is broken into a shulker box item (survial mode)
 	@Inject(method = "getDroppedStacks", cancellable = true, at = @At("TAIL"))
-	private void getDroppedStacksWithDecorations(BlockState state, LootContextParameterSet.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
+	private void getDroppedStacksWithDecorations(BlockState state, LootWorldContext.Builder builder, CallbackInfoReturnable<List<ItemStack>> ci) {
 		BlockEntity blockEntity = builder.getOptional(LootContextParameters.BLOCK_ENTITY);
 		for(ItemStack stack : ci.getReturnValue()) copyDecorations(blockEntity, stack);
 	}

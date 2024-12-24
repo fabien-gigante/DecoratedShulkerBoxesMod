@@ -20,6 +20,7 @@
 			"com.fabien_gigante.DecoratedShulkerBoxesModClient"
 		]
 	},
+	"accessWidener": "DecoratedShulkerBoxesMod.accesswidener",
 	"mixins": [
 		"DecoratedShulkerBoxesMod.mixins.json",
 		{

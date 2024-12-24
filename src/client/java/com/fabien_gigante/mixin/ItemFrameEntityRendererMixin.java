@@ -12,7 +12,7 @@ import net.minecraft.component.type.MapIdComponent;
 @Mixin(ItemFrameEntityRenderer.class)
 public class ItemFrameEntityRendererMixin {
 	// Item frames "out of the world" should render a filled map as the map item itself
-	@Redirect(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/decoration/ItemFrameEntity;getMapId(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/component/type/MapIdComponent;"))
+	@Redirect(method = "updateRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/decoration/ItemFrameEntity;getMapId(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/component/type/MapIdComponent;"))
 	private MapIdComponent getMapId(ItemFrameEntity itemFrameEntity, ItemStack itemStack) {
 		return itemFrameEntity.getWorld() == null ? null : itemFrameEntity.getMapId(itemStack);
 	}

@@ -59,6 +59,6 @@ public interface IDecoratedShulkerBox {
 	}
 	public static void putNbtDisplayedItem(RegistryWrapper.WrapperLookup registries, NbtCompound nbt, ItemStack stack) {
 		if (stack == null) { nbt.remove(NBTKEY_DISPLAYED_ITEM); return; }
-		nbt.put(NBTKEY_DISPLAYED_ITEM, stack.encode(registries));
+		nbt.put(NBTKEY_DISPLAYED_ITEM, stack.toNbt(registries));
 	}
 }

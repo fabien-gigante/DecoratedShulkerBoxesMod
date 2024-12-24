@@ -11,6 +11,5 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Decorated Shulker Boxes - Mod starting...");
-		DecoratedShulkerBoxCauldronBehavior.init();
 	}
 }

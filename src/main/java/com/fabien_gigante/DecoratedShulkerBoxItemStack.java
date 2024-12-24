@@ -2,6 +2,7 @@ package com.fabien_gigante;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.component.DataComponentTypes;
@@ -55,7 +56,7 @@ public class DecoratedShulkerBoxItemStack implements IDecoratedShulkerBox {
 	// Implements IDecoratedShulkerBox : for secondary color
 
 	public DyeColor getColor() {
-		return ShulkerBoxBlock.getColor(this.stack.getItem());
+		return ((ShulkerBoxBlock)Block.getBlockFromItem(this.stack.getItem())).getColor();
 	}
 
 	public boolean hasSecondaryColor() {  return IDecoratedShulkerBox.hasNbtSecondaryColor(getBlockEntityData()); }
