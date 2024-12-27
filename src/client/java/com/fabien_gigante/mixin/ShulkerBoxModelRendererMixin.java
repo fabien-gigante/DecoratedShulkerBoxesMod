@@ -1,6 +1,5 @@
 package com.fabien_gigante.mixin;
 
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.ShulkerBoxBlockEntityRenderer;
@@ -17,8 +16,8 @@ import net.minecraft.util.math.Direction;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
-import com.fabien_gigante.IDecoratedShulkerBox;
+import com.fabien_gigante.DecoratedBoxItemStack;
+import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
 @Mixin(ShulkerBoxModelRenderer.class)
@@ -37,10 +36,10 @@ public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModel
 
     @Override
 	public Void getData(ItemStack stack) {
-        IDecoratedShulkerBox decorated = DecoratedShulkerBoxItemStack.from(MinecraftClient.getInstance().world, stack);
-		DyeColor secondaryColor = decorated != null ? decorated.getSecondaryColor() : null;
+        IDecoratedBox decorated = new DecoratedBoxItemStack(stack);
+		DyeColor secondaryColor = decorated.getSecondaryColor();
 		this.secondaryId = secondaryColor == null ? textureId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId());
-        this.displayedItem = decorated != null ? decorated.getDisplayedItem() : null;
+        this.displayedItem = decorated.getDisplayedItem();
         return null;
 	}
 

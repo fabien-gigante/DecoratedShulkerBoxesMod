@@ -24,15 +24,14 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
+import com.fabien_gigante.DecoratedBoxItemStack;
 
 @Mixin(CauldronBehavior.class)
 public interface CauldronBehaviorMixin {
     @Inject(method="cleanShulkerBox", at = @At("RETURN"), cancellable = true)
 	private static void cleanShulkerBox(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack, CallbackInfoReturnable<ActionResult> ci) {
         if (ci.getReturnValue() != ActionResult.PASS && !world.isClient) {
-            DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.from(world, player.getStackInHand(hand));
-            if (shulker != null) shulker.setSecondaryColor(null);
+            new DecoratedBoxItemStack(player.getStackInHand(hand)).setSecondaryColor(null);
         }
     }
 

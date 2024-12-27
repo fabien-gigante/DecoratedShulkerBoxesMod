@@ -3,10 +3,7 @@
 	"package": "com.fabien_gigante.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"BlockEntityMixin",
-		"LockableContainerBlockEntityMixin",
 		"ShulkerBoxBlockEntityMixin",
-		"ShulkerBoxBlockMixin",
 		"TransmuteRecipeMixin",
 		"CauldronBehaviorMixin",
 		"AnvilScreenHandlerMixin",

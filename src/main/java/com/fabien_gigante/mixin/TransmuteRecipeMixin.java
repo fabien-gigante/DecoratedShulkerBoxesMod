@@ -9,8 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
-import com.fabien_gigante.IDecoratedShulkerBox;
+import com.fabien_gigante.DecoratedBoxItemStack;
 
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
@@ -62,8 +61,7 @@ public class TransmuteRecipeMixin {
 		if (this.result.isIn(ItemTags.SHULKER_BOXES)) {
 			ItemStack extraDye = single(input, (stack) -> stack.getItem() instanceof DyeItem && !this.material.test(stack));
 			DyeColor secondaryColor = extraDye.getItem() instanceof DyeItem dye ? dye.getColor() : null;
-			IDecoratedShulkerBox decorated = DecoratedShulkerBoxItemStack.from(wrapperLookup, craftedItem);
-			if (decorated != null) decorated.setSecondaryColor(secondaryColor);
+			new DecoratedBoxItemStack(craftedItem).setSecondaryColor(secondaryColor);
 		}
 		return craftedItem;
 	}

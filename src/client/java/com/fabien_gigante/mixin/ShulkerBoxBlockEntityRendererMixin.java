@@ -28,7 +28,7 @@ import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Shadow;
 
-import com.fabien_gigante.IDecoratedShulkerBox;
+import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
 @Mixin(ShulkerBoxBlockEntityRenderer.class)
@@ -83,10 +83,10 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		Direction facing = (Direction)shulker.getCachedState().get(ShulkerBoxBlock.FACING, Direction.UP);
 		DyeColor dyeColor = shulker.getColor();
 		SpriteIdentifier lidId = dyeColor == null ? TexturedRenderLayers.SHULKER_TEXTURE_ID : TexturedRenderLayers.getShulkerBoxTextureId(dyeColor);
-		DyeColor secondaryColor = shulker instanceof IDecoratedShulkerBox decorated ? decorated.getSecondaryColor() : null;
+		DyeColor secondaryColor = shulker instanceof IDecoratedBox decorated ? decorated.getSecondaryColor() : null;
 		SpriteIdentifier baseId = secondaryColor == null ? lidId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId());
 		float openness = shulker.getAnimationProgress(delta);
-		ItemStack displayed = shulker instanceof IDecoratedShulkerBox decorated ? decorated.getDisplayedItem() : null;
+		ItemStack displayed = shulker instanceof IDecoratedBox decorated ? decorated.getDisplayedItem() : null;
 		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, false, delta);
 	}
 }

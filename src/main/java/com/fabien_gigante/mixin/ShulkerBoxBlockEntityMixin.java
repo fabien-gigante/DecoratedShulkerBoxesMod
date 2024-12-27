@@ -1,98 +1,80 @@
 package com.fabien_gigante.mixin;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.component.ComponentMap;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.Text;
-import net.minecraft.text.HoverEvent.ItemStackContent;
 import net.minecraft.util.DyeColor;
+import net.minecraft.util.math.BlockPos;
 
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.fabien_gigante.IDecoratedShulkerBox;
+import com.fabien_gigante.DecoratedBoxComponent;
+import com.fabien_gigante.IDecoratedBox;
 
 @Mixin(ShulkerBoxBlockEntity.class)
-public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockEntityMixin implements IDecoratedShulkerBox {
+public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockEntity implements IDecoratedBox {
 	@Unique
-	private DyeColor secondaryColor = null;
-	private ItemStack displayedItem = null;
+	private DecoratedBoxComponent deco = DecoratedBoxComponent.DEFAULT;
 
-	// Shulker boxed can be decorated with : a secondary color
+	private ShulkerBoxBlockEntityMixin(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) { super(blockEntityType, blockPos, blockState); }
 
+	// Shulker boxed can be decorated
+	
 	@Shadow
 	public abstract DyeColor getColor();
+	public void setDecorations(DecoratedBoxComponent deco) { this.deco = deco; }
+	public DecoratedBoxComponent getDecorations() { return this.deco; }
 
-	@Override
-	public boolean hasSecondaryColor() { return this.secondaryColor != null; }
-
-	@Override
-	public DyeColor getSecondaryColor() {
-		return this.secondaryColor == null ? this.getColor() : this.secondaryColor;
-	}
-	@Override
-	public void setSecondaryColor(DyeColor color) {
-		this.secondaryColor = color == this.getColor() ? null : color;
+	// Persistency
+	
+	@Inject(method = "readNbt", at = @At("TAIL"))
+	protected void readNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) {
+		this.deco =	DecoratedBoxComponent.readNbt(nbt, lookup);
 	}
 
-	// Shulker boxed can be decorated with : a displayed item
-
+	@Inject(method = "writeNbt", at = @At("TAIL"))
+	protected void writeNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) {
+		this.deco.writeNbt(nbt, lookup);
+	}
+	
 	@Override
-	public boolean hasDisplayedItem() { return displayedItem != null; }
-
-	@Override
-	public ItemStack getDisplayedItem() { 
-		ItemStack displayedItem = this.displayedItem; 
-		if (displayedItem == null) {
-			// Fallback implementation (mod used as client only, with server plugin setting the hover show item)
-			Text text = getCustomName();
-			HoverEvent hover = text != null ? text.getStyle().getHoverEvent() : null;
-			ItemStackContent content = hover != null ? hover.getValue(HoverEvent.Action.SHOW_ITEM) : null;
-			if (content != null) displayedItem = content.asStack();
-		}
-		return displayedItem;
+	public NbtCompound toInitialChunkDataNbt(WrapperLookup lookup) {
+		return this.deco.writeNbt(new NbtCompound(), lookup);
 	}
 
 	@Override
-	public void setDisplayedItem(ItemStack stack) {
-		this.displayedItem = stack;
-	 }
-
-	// Persistency in Nbt...
-
-	@Unique
-	protected void readDecorationNbt(WrapperLookup lookup, NbtCompound nbt) {
-		this.secondaryColor = nbt == null ? null : IDecoratedShulkerBox.getNbtSecondaryColor(nbt);
-		this.displayedItem = nbt == null ? null : IDecoratedShulkerBox.getNbtDisplayedItem(lookup, nbt);
-	}
-	@Unique
-	protected void writeDecorationNbt(WrapperLookup lookup, NbtCompound nbt) {
-		if (nbt != null) {
-			IDecoratedShulkerBox.putNbtSecondaryColor(nbt, this.secondaryColor);
-			IDecoratedShulkerBox.putNbtDisplayedItem(lookup, nbt, this.displayedItem);
-		}
+	public Packet<ClientPlayPacketListener> toUpdatePacket() {
+		return BlockEntityUpdateS2CPacket.create((BlockEntity)(Object)this);
 	}
 
 	@Override
-	protected void readNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) { readDecorationNbt(lookup, nbt); }
-	@Override
-	protected void writeNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) { writeDecorationNbt(lookup, nbt); }
-	@Override
-	protected void toInitialChunkDataNbt(WrapperLookup lookup, CallbackInfoReturnable<NbtCompound> cir) {
-		writeDecorationNbt(lookup, cir.getReturnValue());
+	public void readComponents(ComponentsAccess components) {
+		super.readComponents(components);
+		this.deco = components.getOrDefault(DecoratedBoxComponent.TYPE, DecoratedBoxComponent.DEFAULT);
 	}
+ 
 	@Override
-	protected void toUpdatePacket(CallbackInfoReturnable<@Nullable Packet<ClientPlayPacketListener>> cir) {
-		cir.setReturnValue(BlockEntityUpdateS2CPacket.create((BlockEntity)(Object)this));
+	public void addComponents(ComponentMap.Builder builder) {
+		super.addComponents(builder);
+		builder.add(DecoratedBoxComponent.TYPE, this.deco.orNull());
+	}
+
+	@Override
+	public void removeFromCopiedStackNbt(NbtCompound nbt) {
+		super.removeFromCopiedStackNbt(nbt);
+		DecoratedBoxComponent.removeNbt(nbt);
 	}
 }

@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
+import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(GrindstoneScreenHandler.class)
@@ -44,8 +44,7 @@ public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler impleme
 		ItemStack returnValue = ci.getReturnValue();
 		if (returnValue != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return;
 		returnValue = firstInput.copy();
-		var decorated = DecoratedShulkerBoxItemStack.from(player, returnValue);
-		decorated.setDisplayedItem(null);
+		new DecoratedBoxItemStack(returnValue).setDisplayedItem(null);
 		ci.setReturnValue(returnValue);
 	}
 
@@ -57,16 +56,13 @@ public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler impleme
 	// Give back the previous decoration item to the player
 	public void onTakeOutput(PlayerEntity player, ItemStack stack) {
 		ItemStack firstInput = input.getStack(0);
-		if (isForgedShulkerBox(firstInput)) {
-			DecoratedShulkerBoxItemStack shulker = DecoratedShulkerBoxItemStack.from(player, firstInput);
-			if (shulker != null) this.context.run((world,pos) -> shulker.dropDisplayedItem(world, pos, player));
-		}
+		if (isForgedShulkerBox(firstInput))
+			this.context.run((world,pos) -> new DecoratedBoxItemStack(firstInput).dropDisplayedItem(world, pos, player));
 	}
 
 	@Unique
 	private boolean isForgedShulkerBox(ItemStack stack) {
-		var decorated = DecoratedShulkerBoxItemStack.from(player, stack);
-		return decorated != null && decorated.hasDisplayedItem();
+		return new DecoratedBoxItemStack(stack).hasDisplayedItem();
 	}
 
 	@Unique

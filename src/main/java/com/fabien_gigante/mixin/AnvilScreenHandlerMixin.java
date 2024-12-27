@@ -4,6 +4,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.screen.AnvilScreenHandler;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.Property;
@@ -22,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import com.fabien_gigante.DecoratedShulkerBoxItemStack;
+import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(AnvilScreenHandler.class)
@@ -44,7 +45,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
 		if (!this.isValidShulkerBoxRecipe()) return;
 		ItemStack forged = this.input.getStack(0).copy(), ingredient = this.input.getStack(1);
 		if (ingredient != null && !ingredient.isEmpty())
-			DecoratedShulkerBoxItemStack.from(this.player, forged).setDisplayedItem(ingredient.copyWithCount(1));
+			new DecoratedBoxItemStack(forged).setDisplayedItem(ingredient.copyWithCount(1));
 		renameItem(forged);
 		this.output.setStack(0, forged);
 		this.levelCost.set(1);
@@ -67,16 +68,16 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
 		if (!this.isValidShulkerBoxRecipe()) return;
 		ItemStack ingredient = this.input.getStack(1);
 		if (ingredient == null || ingredient.isEmpty()) return;
-		DecoratedShulkerBoxItemStack inputShulker = DecoratedShulkerBoxItemStack.from(player, this.input.getStack(0));
-		if (inputShulker != null) this.context.run((world,pos) -> inputShulker.dropDisplayedItem(world, pos, player));
+		DecoratedBoxItemStack decorated = new DecoratedBoxItemStack(this.input.getStack(0));
+		this.context.run((world,pos) -> decorated.dropDisplayedItem(world, pos, player));
 	}
 
 	@Unique
 	private boolean isValidShulkerBoxRecipe() {
 		ItemStack forged = this.input.getStack(0), ingredient = this.input.getStack(1);
-		if (!DecoratedShulkerBoxItemStack.isShulkerBox(forged)) return false;
+		if (!forged.isIn(ItemTags.SHULKER_BOXES)) return false;
 		// Avoid some forms of recursion
-		var decoration = DecoratedShulkerBoxItemStack.from(player, ingredient);
-		return decoration == null || (!decoration.hasDisplayedItem() && decoration.isEmpty());
+		var decorated = new DecoratedBoxItemStack(ingredient);
+		return !decorated.hasDisplayedItem() && !decorated.hasContent();
 	}
 }
