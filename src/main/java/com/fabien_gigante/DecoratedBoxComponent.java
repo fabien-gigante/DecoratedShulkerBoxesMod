@@ -35,10 +35,11 @@ public record DecoratedBoxComponent(DyeColor secondaryColor, ItemStack displayed
     public boolean isEmpty() { return secondaryColor==null && displayedItem==null; }
     public @Nullable DecoratedBoxComponent orNull() { return isEmpty() ? null : this; }
 
+    private static ItemStack nonNull(ItemStack stack) { return stack == null ? ItemStack.EMPTY : stack; }
     public boolean equals(Object object) {
         if (this == object) return true;
         if (!(object instanceof DecoratedBoxComponent deco)) return false;
-        return secondaryColor==deco.secondaryColor && ItemStack.areEqual(this.displayedItem, deco.displayedItem);
+        return secondaryColor==deco.secondaryColor && ItemStack.areEqual(nonNull(this.displayedItem), nonNull(deco.displayedItem));
    }
 
     public DecoratedBoxComponent setSecondaryColor(DyeColor secondaryColor) { return new DecoratedBoxComponent(secondaryColor, displayedItem); }
