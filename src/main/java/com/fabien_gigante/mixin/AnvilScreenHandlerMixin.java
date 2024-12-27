@@ -1,5 +1,14 @@
 package com.fabien_gigante.mixin;
 
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -14,26 +23,14 @@ import net.minecraft.screen.slot.ForgingSlotsManager;
 import net.minecraft.text.Text;
 import net.minecraft.util.StringHelper;
 
-import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(AnvilScreenHandler.class)
 public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler implements IScreenHandlerSlotListener {
-	@Shadow
-	private int repairItemUsage;
-	@Shadow @Final
-	private Property levelCost;
-	@Shadow @Nullable
-	private String newItemName;
+	@Shadow	private int repairItemUsage;
+	@Shadow @Final private Property levelCost;
+	@Shadow @Nullable private String newItemName;
 
 	public AnvilScreenHandlerMixin(@Nullable ScreenHandlerType<?> type, int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, ForgingSlotsManager forgingSlotsManager) {
 		super(type, syncId, playerInventory, context, forgingSlotsManager);
@@ -76,7 +73,7 @@ public abstract class AnvilScreenHandlerMixin extends ForgingScreenHandler imple
 	private boolean isValidShulkerBoxRecipe() {
 		ItemStack forged = this.input.getStack(0), ingredient = this.input.getStack(1);
 		if (!forged.isIn(ItemTags.SHULKER_BOXES)) return false;
-		// Avoid some forms of recursion
+		// Avoid nested storage
 		var decorated = new DecoratedBoxItemStack(ingredient);
 		return !decorated.hasDisplayedItem() && !decorated.hasContent();
 	}

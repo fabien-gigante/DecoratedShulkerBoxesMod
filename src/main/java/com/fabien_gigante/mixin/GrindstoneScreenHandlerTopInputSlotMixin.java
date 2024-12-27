@@ -1,23 +1,23 @@
 package com.fabien_gigante.mixin;
 
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GrindstoneScreenHandler;
-import net.minecraft.screen.slot.Slot;
-
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.GrindstoneScreenHandler;
+import net.minecraft.screen.slot.Slot;
+
 import com.fabien_gigante.IScreenHandlerSlotListener;
 
 @Mixin(targets = "net/minecraft/screen/GrindstoneScreenHandler$2")
 public class GrindstoneScreenHandlerTopInputSlotMixin extends Slot {
-	@Unique
-	private GrindstoneScreenHandler grindstoneHandler;
+	@Unique @Final private GrindstoneScreenHandler grindstoneHandler;
 
 	public GrindstoneScreenHandlerTopInputSlotMixin(Inventory inventory, int index, int x, int y) { super(inventory, index, x, y); }
 

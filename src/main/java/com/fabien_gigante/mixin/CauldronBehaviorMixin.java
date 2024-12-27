@@ -1,5 +1,13 @@
 package com.fabien_gigante.mixin;
 
+import java.util.Map;
+
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import net.minecraft.item.BundleItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -16,23 +24,14 @@ import net.minecraft.block.LeveledCauldronBlock;
 import net.minecraft.block.cauldron.CauldronBehavior;
 import net.minecraft.entity.player.PlayerEntity;
 
-import java.util.Map;
-
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import com.fabien_gigante.DecoratedBoxItemStack;
 
 @Mixin(CauldronBehavior.class)
 public interface CauldronBehaviorMixin {
     @Inject(method="cleanShulkerBox", at = @At("RETURN"), cancellable = true)
 	private static void cleanShulkerBox(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack, CallbackInfoReturnable<ActionResult> ci) {
-        if (ci.getReturnValue() != ActionResult.PASS && !world.isClient) {
+        if (ci.getReturnValue() != ActionResult.PASS && !world.isClient)
             new DecoratedBoxItemStack(player.getStackInHand(hand)).setSecondaryColor(null);
-        }
     }
 
     @Inject(method="registerBehavior", at = @At("TAIL"))
@@ -43,15 +42,13 @@ public interface CauldronBehaviorMixin {
     }
 
 	private static ActionResult cleanBundle(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack) {
-		if (!stack.isIn(ItemTags.BUNDLES) || stack.isOf(Items.BUNDLE)) {
+		if (!stack.isIn(ItemTags.BUNDLES) || stack.isOf(Items.BUNDLE))
 			return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-		} else {
-			if (!world.isClient) {
-				ItemStack itemStack = stack.copyComponentsToNewStack(Items.BUNDLE, 1);
-				player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, itemStack, false));
-				LeveledCauldronBlock.decrementFluidLevel(state, world, pos);
-			}
-			return ActionResult.SUCCESS;
+		if (!world.isClient) {
+			ItemStack itemStack = stack.copyComponentsToNewStack(Items.BUNDLE, 1);
+			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, itemStack, false));
+			LeveledCauldronBlock.decrementFluidLevel(state, world, pos);
 		}
+		return ActionResult.SUCCESS;
 	}    
 }

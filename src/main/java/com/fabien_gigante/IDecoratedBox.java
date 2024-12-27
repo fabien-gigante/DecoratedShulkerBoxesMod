@@ -7,7 +7,7 @@ import net.minecraft.util.DyeColor;
 public interface IDecoratedBox {
 	// Component accessors
 	public DecoratedBoxComponent getDecorations();
-	public void setDecorations(DecoratedBoxComponent deco);
+	public void setDecorations(DecoratedBoxComponent decorations);
 
 	// Primary color accessor, if any
 	public DyeColor getColor();

@@ -8,8 +8,7 @@ import java.util.stream.Stream;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-
-import com.fabien_gigante.DecoratedBoxItemStack;
+import org.spongepowered.asm.mixin.Final;
 
 import net.minecraft.item.DyeItem;
 import net.minecraft.item.Item;
@@ -23,10 +22,12 @@ import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.DyeColor;
 import net.minecraft.world.World;
 
+import com.fabien_gigante.DecoratedBoxItemStack;
+
 @Mixin(TransmuteRecipe.class)
 public class TransmuteRecipeMixin {
-	@Shadow Ingredient input, material;
-	@Shadow RegistryEntry<Item> result;
+	@Shadow @Final Ingredient input, material;
+	@Shadow @Final RegistryEntry<Item> result;
 
 	// Helpers to search the recipe inventory
 	private static Stream<ItemStack> search(CraftingRecipeInput input, Predicate<ItemStack> condition) {

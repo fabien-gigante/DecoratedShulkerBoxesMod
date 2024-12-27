@@ -8,9 +8,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.loot.LootTable;
@@ -18,6 +15,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.ComponentType;
 import net.minecraft.loot.function.CopyComponentsLootFunction;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 
 public class DecoratedShulkerBoxesMod implements ModInitializer {
 	public static final String MOD_ID = "decorated-shulker-boxes";

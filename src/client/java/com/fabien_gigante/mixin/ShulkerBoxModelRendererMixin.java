@@ -1,5 +1,9 @@
 package com.fabien_gigante.mixin;
 
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Final;
+
 import net.minecraft.client.render.TexturedRenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.ShulkerBoxBlockEntityRenderer;
@@ -13,24 +17,16 @@ import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-
 import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
 @Mixin(ShulkerBoxModelRenderer.class)
 public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModelRenderer {
-    @Shadow
-	private ShulkerBoxBlockEntityRenderer blockEntityRenderer;
-    @Shadow
-	private float openness;
-    @Shadow
-	private Direction orientation;
-    @Shadow
-	private SpriteIdentifier textureId;
-
+    @Shadow @Final private ShulkerBoxBlockEntityRenderer blockEntityRenderer;
+    @Shadow @Final private float openness;
+    @Shadow @Final private Direction orientation;
+    @Shadow @Final private SpriteIdentifier textureId;
     private SpriteIdentifier secondaryId;
     private ItemStack displayedItem;
 

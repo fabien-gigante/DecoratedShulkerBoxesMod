@@ -1,5 +1,16 @@
 package com.fabien_gigante.mixin;
 
+import org.joml.Math;
+import org.joml.Quaternionf;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Final;
+
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.model.ModelPart;
 import net.minecraft.client.render.TexturedRenderLayers;
@@ -18,22 +29,12 @@ import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
-import org.joml.Math;
-import org.joml.Quaternionf;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.Shadow;
-
 import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
 @Mixin(ShulkerBoxBlockEntityRenderer.class)
 public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedShulkerBoxBlockEntityRenderer {
-	@Shadow private ShulkerBoxBlockModel model;
+	@Shadow @Final private ShulkerBoxBlockModel model;
 	private ModelPart lid, base;
 
 	@Unique	private static ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);

@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 
 // ItemStack wrapper for decorated shulker box item stack
 public class DecoratedBoxItemStack implements IDecoratedBox {
-	private ItemStack stack;
+	private final ItemStack stack;
 	public DecoratedBoxItemStack(ItemStack stack) { this.stack = stack; }
 
 	// Return the underlying ItemStack
@@ -28,8 +28,8 @@ public class DecoratedBoxItemStack implements IDecoratedBox {
 	public DecoratedBoxComponent getDecorations() { 
 		return stack.getOrDefault(DecoratedBoxComponent.TYPE, DecoratedBoxComponent.DEFAULT);
 	}
-	public void setDecorations(DecoratedBoxComponent deco) {
-		stack.set(DecoratedBoxComponent.TYPE, deco.orNull());
+	public void setDecorations(DecoratedBoxComponent decorations) {
+		stack.set(DecoratedBoxComponent.TYPE, decorations.orNull());
 	}
 	public boolean hasContent() {
 		ContainerComponent container = stack.get(DataComponentTypes.CONTAINER);
