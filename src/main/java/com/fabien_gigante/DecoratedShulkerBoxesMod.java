@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.loot.LootTable;
@@ -15,8 +16,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.ComponentType;
 import net.minecraft.loot.function.CopyComponentsLootFunction;
-
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.fabricmc.fabric.api.event.registry.RegistryAttributeHolder;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 
 public class DecoratedShulkerBoxesMod implements ModInitializer {
@@ -24,15 +26,20 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	
     public static final ComponentType<DecoratedBoxComponent> DECORATION_TYPE = DecoratedBoxComponent.TYPE;
-	public static final Set<RegistryKey<LootTable>> SHULKER_BOX_LOOT_TABLES = 
-		Stream.concat(Stream.of(Blocks.SHULKER_BOX), Arrays.stream(DyeColor.values()).map(c -> ShulkerBoxBlock.get(c)))
-		.map(b -> b.getLootTableKey().orElseThrow()).collect(Collectors.toSet());
 
 	// Server-side mod entry point
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Decorated Shulker Boxes - Mod starting...");
+		updateLootTables();
+		// Allow vanilla clients to connect (is there a cleaner way to do this ?)
+		RegistryAttributeHolder.get(Registries.DATA_COMPONENT_TYPE).addAttribute(RegistryAttribute.OPTIONAL);
+	}
 
+	private void updateLootTables() {
+		Set<RegistryKey<LootTable>> SHULKER_BOX_LOOT_TABLES = 
+			Stream.concat(Stream.of(Blocks.SHULKER_BOX), Arrays.stream(DyeColor.values()).map(c -> ShulkerBoxBlock.get(c)))
+			.map(b -> b.getLootTableKey().orElseThrow()).collect(Collectors.toSet());
 		LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
 			if (source.isBuiltin() && SHULKER_BOX_LOOT_TABLES.contains(key))
 				builder.apply(
