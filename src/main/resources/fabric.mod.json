@@ -36,8 +36,5 @@
 	},
 	"suggests": {
 		"another-mod": "*"
-	},
-	"custom": {
-		"clientRequired": false
 	}	
 }

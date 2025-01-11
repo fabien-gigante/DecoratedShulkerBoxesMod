@@ -43,8 +43,8 @@ public class TransmuteRecipeMixin {
 	@Overwrite
 	public boolean matches(CraftingRecipeInput input, World world) {
 		// Matches standard recipe
-		if (single(input, (stack) -> this.input.test(stack)) == ItemStack.EMPTY) return false;
-		if (single(input, (stack) -> this.material.test(stack)) == ItemStack.EMPTY) return false;
+		if (single(input, this.input::test) == ItemStack.EMPTY) return false;
+		if (single(input, this.material::test) == ItemStack.EMPTY) return false;
 		if (input.getStackCount() == 2) return true;
 		// Matches extra dye recipe
 		if (input.getStackCount() != 3 || !this.result.isIn(ItemTags.SHULKER_BOXES)) return false;
@@ -56,7 +56,7 @@ public class TransmuteRecipeMixin {
 	@Overwrite
 	public ItemStack craft(CraftingRecipeInput input, WrapperLookup wrapperLookup) {
 		// Reproduce vanilla behavior
-		ItemStack inputItem = single(input, (stack) -> this.input.test(stack));
+		ItemStack inputItem = single(input, this.input::test);
 		ItemStack craftedItem = inputItem.copyComponentsToNewStack(this.result.value(), 1);
 		// Additional behavior for extra dye recipe
 		if (this.result.isIn(ItemTags.SHULKER_BOXES)) {
