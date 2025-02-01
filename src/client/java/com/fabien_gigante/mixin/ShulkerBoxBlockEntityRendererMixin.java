@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Final;
 
@@ -24,11 +23,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.RotationAxis;
 
 import com.fabien_gigante.DecoratedShulkerBoxesModClient;
-import com.fabien_gigante.FakeItemFrameEntity;
 import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
@@ -36,8 +36,6 @@ import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedShulkerBoxBlockEntityRenderer {
 	@Shadow @Final private ShulkerBoxBlockModel model;
 	private ModelPart lid, base;
-
-	@Unique	private static FakeItemFrameEntity FAKE_ITEM_FRAME = new FakeItemFrameEntity();
 
 	@Inject(method="<init>(Lnet/minecraft/client/render/entity/model/LoadedEntityModels;)V", at=@At("TAIL"))
 	private void onInit(LoadedEntityModels models, CallbackInfo ci) {
@@ -56,14 +54,17 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		this.base.render(matrices, baseId.getVertexConsumer(provider, this.model::getLayer), light, overlay);
 	}
 
-	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, float openness, ItemStack displayed, boolean scale, float delta) {
+	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, ItemStack displayed, boolean scale, float delta) {
 		if (displayed == null) return;
-		FAKE_ITEM_FRAME.setHeldItemStack(displayed, false);
-		float yOffset = 7f / 16f - openness / 2f;
+		float yOffset = 7.75f / 16f - openness / 2f;
 		matrices.translate(0, yOffset, 0);
-		if (scale) matrices.scale(1.5f, 1.5f, 1.5f);
 		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * openness));
-		MinecraftClient.getInstance().getEntityRenderDispatcher().render(FAKE_ITEM_FRAME, 0.0, 0.0, 0.0, delta, matrices, provider, light);
+		matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
+		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
+		float s = scale ? .75f : .667f; // (for comparaison, .5f is the scale used by item frame)
+		matrices.scale(s, s, s);
+		MinecraftClient client = MinecraftClient.getInstance();
+		client.getItemRenderer().renderItem(displayed, ModelTransformationMode.FIXED, light, overlay, matrices, provider, client.world, 0);
 	}
 
 	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean scale, float delta) {
@@ -74,7 +75,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		matrices.scale(1.0F, -1.0F, -1.0F);
 		matrices.translate(0.0F, -1.0F, 0.0F);
 		this.renderModel(matrices, provider, light, overlay, openness, lidId, baseId);
-		this.renderDisplayed(matrices, provider, light, openness, displayed, scale, delta);
+		this.renderDisplayed(matrices, provider, light, overlay, openness, displayed, scale, delta);
 		matrices.pop();
 	}
 
