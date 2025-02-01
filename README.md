@@ -12,4 +12,8 @@ Use an anvil to forge an arbitrary item into the shulker box's lid acting as an 
 ![image](https://github.com/user-attachments/assets/ac1075b6-d460-44d1-83bc-d652921db553)
 ![image](https://github.com/user-attachments/assets/af7593e0-ae4e-4751-94fc-2c5ba8bad7c1)
 
-<a href="https://fabricmc.net/"><img src="https://camo.githubusercontent.com/607921ac1756cf04710d06279fbf9f934b3b3f6435ac29d408a12bf4c2015b1b/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f6e706d2f40696e746572677261762f646576696e732d62616467657340332f6173736574732f636f7a792f737570706f727465642f6661627269635f3634682e706e67" alt="Available on Fabric" width="200"></a>           
+## Compatibility
+
+* More culling : Item frame 3-faces culling needs to be disabled
+
+<a href="https://fabricmc.net/"><img src="https://camo.githubusercontent.com/c3bd078e17143a3ed2bd5f424f847f494f87d5c70207670cdee2ed8eaf377c85/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f6e706d2f40696e746572677261762f646576696e732d62616467657340332f6173736574732f636f7a792f737570706f727465642f6661627269635f3634682e706e67" alt="Available for Fabric" width="200"></a>           

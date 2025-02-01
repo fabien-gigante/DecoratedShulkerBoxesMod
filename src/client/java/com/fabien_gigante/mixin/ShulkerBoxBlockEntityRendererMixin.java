@@ -21,14 +21,14 @@ import net.minecraft.client.render.entity.model.LoadedEntityModels;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 
-import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import com.fabien_gigante.DecoratedShulkerBoxesModClient;
+import com.fabien_gigante.FakeItemFrameEntity;
 import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 
@@ -37,11 +37,11 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 	@Shadow @Final private ShulkerBoxBlockModel model;
 	private ModelPart lid, base;
 
-	@Unique	private static ItemFrameEntity ITEM_FRAME_ENTITY = new ItemFrameEntity(null, BlockPos.ORIGIN, Direction.DOWN);
-	static { ITEM_FRAME_ENTITY.setSilent(true); ITEM_FRAME_ENTITY.setInvisible(true); }
+	@Unique	private static FakeItemFrameEntity FAKE_ITEM_FRAME = new FakeItemFrameEntity();
 
 	@Inject(method="<init>(Lnet/minecraft/client/render/entity/model/LoadedEntityModels;)V", at=@At("TAIL"))
 	private void onInit(LoadedEntityModels models, CallbackInfo ci) {
+		DecoratedShulkerBoxesModClient.LOGGER.info("ShulkerBoxBlockEntityRenderer.onInit()");
 		this.lid = this.model.getPart("lid").get();
 		this.base = this.model.getPart("base").get();
 	}
@@ -58,12 +58,12 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 
 	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, float openness, ItemStack displayed, boolean scale, float delta) {
 		if (displayed == null) return;
-		ITEM_FRAME_ENTITY.setHeldItemStack(displayed, false);
+		FAKE_ITEM_FRAME.setHeldItemStack(displayed, false);
 		float yOffset = 7f / 16f - openness / 2f;
 		matrices.translate(0, yOffset, 0);
 		if (scale) matrices.scale(1.5f, 1.5f, 1.5f);
 		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * openness));
-		MinecraftClient.getInstance().getEntityRenderDispatcher().render(ITEM_FRAME_ENTITY, 0.0, 0.0, 0.0, delta, matrices, provider, light);
+		MinecraftClient.getInstance().getEntityRenderDispatcher().render(FAKE_ITEM_FRAME, 0.0, 0.0, 0.0, delta, matrices, provider, light);
 	}
 
 	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean scale, float delta) {
