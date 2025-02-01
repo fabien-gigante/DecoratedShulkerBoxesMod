@@ -57,7 +57,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		matrices.translate(0, 7.75f / 16f - openness / 2f, 0);
 		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180+270 * openness));
 		matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90));
-		float s = scale ? 0.75f : 2f/3f; // (for comparaison, .5f is the scale used by item frame)
+		float s = scale ? 0.75f : 2f/3f; // For comparaison, .5f is the scale used by item frame
 		matrices.scale(s, s, s);
 		MinecraftClient client = MinecraftClient.getInstance();
 		client.getItemRenderer().renderItem(displayed, ModelTransformationMode.FIXED, light, overlay, matrices, provider, client.world, 0);
