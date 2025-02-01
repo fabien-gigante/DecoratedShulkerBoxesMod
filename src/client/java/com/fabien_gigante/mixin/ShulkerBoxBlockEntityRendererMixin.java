@@ -1,7 +1,5 @@
 package com.fabien_gigante.mixin;
 
-import org.joml.Math;
-import org.joml.Quaternionf;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -56,12 +54,10 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 
 	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, ItemStack displayed, boolean scale, float delta) {
 		if (displayed == null) return;
-		float yOffset = 7.75f / 16f - openness / 2f;
-		matrices.translate(0, yOffset, 0);
-		matrices.multiply(new Quaternionf().rotationY(1.5f * (float)Math.PI * openness));
-		matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(90));
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180));
-		float s = scale ? .75f : .667f; // (for comparaison, .5f is the scale used by item frame)
+		matrices.translate(0, 7.75f / 16f - openness / 2f, 0);
+		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180+270 * openness));
+		matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90));
+		float s = scale ? 0.75f : 2f/3f; // (for comparaison, .5f is the scale used by item frame)
 		matrices.scale(s, s, s);
 		MinecraftClient client = MinecraftClient.getInstance();
 		client.getItemRenderer().renderItem(displayed, ModelTransformationMode.FIXED, light, overlay, matrices, provider, client.world, 0);
@@ -69,11 +65,11 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 
 	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean scale, float delta) {
 		matrices.push();
-		matrices.translate(0.5F, 0.5F, 0.5F);
-		matrices.scale(0.9995F, 0.9995F, 0.9995F);
+		matrices.translate(0.5f, 0.5f, 0.5F);
+		matrices.scale(0.9995f, 0.9995f, 0.9995f);
 		matrices.multiply(facing.getRotationQuaternion());
-		matrices.scale(1.0F, -1.0F, -1.0F);
-		matrices.translate(0.0F, -1.0F, 0.0F);
+		matrices.scale(1f, -1f, -1f);
+		matrices.translate(0f, -1f, 0f);
 		this.renderModel(matrices, provider, light, overlay, openness, lidId, baseId);
 		this.renderDisplayed(matrices, provider, light, overlay, openness, displayed, scale, delta);
 		matrices.pop();
