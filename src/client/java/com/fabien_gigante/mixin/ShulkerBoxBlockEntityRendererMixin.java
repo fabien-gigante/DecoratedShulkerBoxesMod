@@ -42,28 +42,24 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		this.base = this.model.getPart("base").get();
 	}
 
-	public void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed) {
-		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, true, 0);
-	}
-
 	private void renderModel(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId) {
 		this.model.animateLid(openness);
 		this.lid.render(matrices, lidId.getVertexConsumer(provider, this.model::getLayer), light, overlay);
 		this.base.render(matrices, baseId.getVertexConsumer(provider, this.model::getLayer), light, overlay);
 	}
 
-	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, ItemStack displayed, boolean scale, float delta) {
+	private void renderDisplayed(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, ItemStack displayed, boolean zoomed) {
 		if (displayed == null) return;
 		matrices.translate(0, 7.75f / 16f - openness / 2f, 0);
 		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180+270 * openness));
 		matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-90));
-		float s = scale ? 0.75f : 2f/3f; // For comparaison, .5f is the scale used by item frame
-		matrices.scale(s, s, s);
+		float scale = zoomed ? 0.75f : 2f/3f; // for comparaison, .5f is the scale used by item frame
+		matrices.scale(scale, scale, scale);
 		MinecraftClient client = MinecraftClient.getInstance();
 		client.getItemRenderer().renderItem(displayed, ModelTransformationMode.FIXED, light, overlay, matrices, provider, client.world, 0);
 	}
 
-	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean scale, float delta) {
+	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean zoomed) {
 		matrices.push();
 		matrices.translate(0.5f, 0.5f, 0.5F);
 		matrices.scale(0.9995f, 0.9995f, 0.9995f);
@@ -71,7 +67,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		matrices.scale(1f, -1f, -1f);
 		matrices.translate(0f, -1f, 0f);
 		this.renderModel(matrices, provider, light, overlay, openness, lidId, baseId);
-		this.renderDisplayed(matrices, provider, light, overlay, openness, displayed, scale, delta);
+		this.renderDisplayed(matrices, provider, light, overlay, openness, displayed, zoomed);
 		matrices.pop();
 	}
 
@@ -85,6 +81,11 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		SpriteIdentifier baseId = secondaryColor == null ? lidId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId());
 		float openness = shulker.getAnimationProgress(delta);
 		ItemStack displayed = shulker instanceof IDecoratedBox decorated ? decorated.getDisplayedItem() : null;
-		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, false, delta);
+		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, false);
+	}
+
+	// IDecoratedShulkerBoxBlockEntityRenderer
+	public void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed) {
+		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, true);
 	}
 }
