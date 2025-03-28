@@ -11,9 +11,8 @@ import net.minecraft.client.render.item.model.special.ShulkerBoxModelRenderer;
 import net.minecraft.client.render.item.model.special.SimpleSpecialModelRenderer;
 import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
 
@@ -34,13 +33,13 @@ public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModel
 	public Void getData(ItemStack stack) {
         IDecoratedBox decorated = new DecoratedBoxItemStack(stack);
 		DyeColor secondaryColor = decorated.getSecondaryColor();
-		this.secondaryId = secondaryColor == null ? textureId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId());
+		this.secondaryId = secondaryColor == null ? textureId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getIndex());
         this.displayedItem = decorated.getDisplayedItem();
         return null;
 	}
 
     @Override
-	public void render(ModelTransformationMode modelTransformationMode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
+	public void render(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
         IDecoratedShulkerBoxBlockEntityRenderer renderer = (IDecoratedShulkerBoxBlockEntityRenderer)this.blockEntityRenderer;
         renderer.render(matrices, vertexConsumers, light, overlay, this.orientation, this.openness, this.textureId, this.secondaryId, this.displayedItem);
 	}

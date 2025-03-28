@@ -20,11 +20,12 @@ import net.minecraft.client.util.math.MatrixStack;
 
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ModelTransformationMode;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3d;
 
 import com.fabien_gigante.DecoratedShulkerBoxesModClient;
 import com.fabien_gigante.IDecoratedBox;
@@ -56,7 +57,7 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 		float scale = zoomed ? 0.75f : 2f/3f; // for comparaison, .5f is the scale used by item frame
 		matrices.scale(scale, scale, scale);
 		MinecraftClient client = MinecraftClient.getInstance();
-		client.getItemRenderer().renderItem(displayed, ModelTransformationMode.FIXED, light, overlay, matrices, provider, client.world, 0);
+		client.getItemRenderer().renderItem(displayed, ItemDisplayContext.FIXED, light, overlay, matrices, provider, client.world, 0);
 	}
 
 	private void render(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Direction facing, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId, ItemStack displayed, boolean zoomed) {
@@ -73,12 +74,12 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 
 	/** @reason using overwrite because behavior change not easy by simple code injection @author fabien **/
 	@Overwrite
-	public void render(ShulkerBoxBlockEntity shulker, float delta, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay) {
+	public void render(ShulkerBoxBlockEntity shulker, float delta, MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, Vec3d vec3d) {
 		Direction facing = (Direction)shulker.getCachedState().get(ShulkerBoxBlock.FACING, Direction.UP);
 		DyeColor dyeColor = shulker.getColor();
 		SpriteIdentifier lidId = dyeColor == null ? TexturedRenderLayers.SHULKER_TEXTURE_ID : TexturedRenderLayers.getShulkerBoxTextureId(dyeColor);
 		DyeColor secondaryColor = shulker instanceof IDecoratedBox decorated ? decorated.getSecondaryColor() : null;
-		SpriteIdentifier baseId = secondaryColor == null ? lidId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getId());
+		SpriteIdentifier baseId = secondaryColor == null ? lidId : TexturedRenderLayers.COLORED_SHULKER_BOXES_TEXTURES.get(secondaryColor.getIndex());
 		float openness = shulker.getAnimationProgress(delta);
 		ItemStack displayed = shulker instanceof IDecoratedBox decorated ? decorated.getDisplayedItem() : null;
 		this.render(matrices, provider, light, overlay, facing, openness, lidId, baseId, displayed, false);

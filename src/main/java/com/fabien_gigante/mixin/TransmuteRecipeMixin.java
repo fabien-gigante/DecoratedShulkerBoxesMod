@@ -11,13 +11,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Final;
 
 import net.minecraft.item.DyeItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.recipe.TransmuteRecipe;
+import net.minecraft.recipe.TransmuteRecipeResult;
 import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.registry.tag.ItemTags;
 import net.minecraft.util.DyeColor;
 import net.minecraft.world.World;
@@ -27,7 +26,7 @@ import com.fabien_gigante.DecoratedBoxItemStack;
 @Mixin(TransmuteRecipe.class)
 public class TransmuteRecipeMixin {
 	@Shadow @Final Ingredient input, material;
-	@Shadow @Final RegistryEntry<Item> result;
+	@Shadow @Final TransmuteRecipeResult result;
 
 	// Helpers to search the recipe inventory
 	private static Stream<ItemStack> search(CraftingRecipeInput input, Predicate<ItemStack> condition) {
@@ -47,7 +46,7 @@ public class TransmuteRecipeMixin {
 		if (single(input, this.material::test) == ItemStack.EMPTY) return false;
 		if (input.getStackCount() == 2) return true;
 		// Matches extra dye recipe
-		if (input.getStackCount() != 3 || !this.result.isIn(ItemTags.SHULKER_BOXES)) return false;
+		if (input.getStackCount() != 3 || !this.result.itemEntry.isIn(ItemTags.SHULKER_BOXES)) return false;
 		List<ItemStack> dyes = search(input, (stack) -> stack.getItem() instanceof DyeItem).toList();
 		return dyes.size() == 2 && this.material.test(dyes.get(0)) && !this.material.test(dyes.get(1));
 	}
@@ -57,9 +56,9 @@ public class TransmuteRecipeMixin {
 	public ItemStack craft(CraftingRecipeInput input, WrapperLookup wrapperLookup) {
 		// Reproduce vanilla behavior
 		ItemStack inputItem = single(input, this.input::test);
-		ItemStack craftedItem = inputItem.copyComponentsToNewStack(this.result.value(), 1);
+		ItemStack craftedItem = this.result.apply(inputItem);
 		// Additional behavior for extra dye recipe
-		if (this.result.isIn(ItemTags.SHULKER_BOXES)) {
+		if (this.result.itemEntry.isIn(ItemTags.SHULKER_BOXES)) {
 			ItemStack extraDye = single(input, (stack) -> stack.getItem() instanceof DyeItem && !this.material.test(stack));
 			DyeColor secondaryColor = extraDye.getItem() instanceof DyeItem dye ? dye.getColor() : null;
 			new DecoratedBoxItemStack(craftedItem).setSecondaryColor(secondaryColor);
