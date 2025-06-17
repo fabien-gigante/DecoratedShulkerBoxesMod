@@ -24,7 +24,7 @@ import com.fabien_gigante.IDecoratedShulkerBoxBlockEntityRenderer;
 public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModelRenderer {
     @Shadow @Final private ShulkerBoxBlockEntityRenderer blockEntityRenderer;
     @Shadow @Final private float openness;
-    @Shadow @Final private Direction orientation;
+    @Shadow @Final private Direction facing;
     @Shadow @Final private SpriteIdentifier textureId;
     private SpriteIdentifier secondaryId;
     private ItemStack displayedItem;
@@ -41,6 +41,6 @@ public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModel
     @Override
 	public void render(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
         IDecoratedShulkerBoxBlockEntityRenderer renderer = (IDecoratedShulkerBoxBlockEntityRenderer)this.blockEntityRenderer;
-        renderer.render(matrices, vertexConsumers, light, overlay, this.orientation, this.openness, this.textureId, this.secondaryId, this.displayedItem);
+        renderer.render(matrices, vertexConsumers, light, overlay, this.facing, this.openness, this.textureId, this.secondaryId, this.displayedItem);
 	}
 }

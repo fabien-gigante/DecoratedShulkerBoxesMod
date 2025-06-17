@@ -19,6 +19,8 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.storage.WriteView;
+import net.minecraft.storage.ReadView;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.BlockPos;
 
@@ -41,19 +43,19 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 
 	// Persistency
 	
-	@Inject(method = "readNbt", at = @At("TAIL"))
-	protected void readNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) {
-		this.decorations =	DecoratedBoxComponent.readNbt(nbt, lookup);
+	@Inject(method = "readData", at = @At("TAIL"))
+	protected void readData(ReadView view, CallbackInfo ci) {
+		this.decorations =	DecoratedBoxComponent.readData(view);
 	}
 
-	@Inject(method = "writeNbt", at = @At("TAIL"))
-	protected void writeNbt(NbtCompound nbt, WrapperLookup lookup, CallbackInfo ci) {
-		this.decorations.writeNbt(nbt, lookup);
+	@Inject(method = "writeData", at = @At("TAIL"))
+	protected void writeData(WriteView view, CallbackInfo ci) {
+		this.decorations.writeData(view);
 	}
 	
 	@Override
 	public NbtCompound toInitialChunkDataNbt(WrapperLookup lookup) {
-		return this.decorations.writeNbt(new NbtCompound(), lookup);
+		return createNbt(lookup);
 	}
 
 	@Override
@@ -74,8 +76,8 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 	}
 
 	@Override
-	public void removeFromCopiedStackNbt(NbtCompound nbt) {
-		super.removeFromCopiedStackNbt(nbt);
-		DecoratedBoxComponent.removeNbt(nbt);
+	public void removeFromCopiedStackData(WriteView view) {
+		super.removeFromCopiedStackData(view);
+		DecoratedBoxComponent.removeData(view);
 	}
 }

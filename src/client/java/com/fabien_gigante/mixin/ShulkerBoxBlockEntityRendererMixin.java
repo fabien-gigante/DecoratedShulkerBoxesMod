@@ -39,8 +39,9 @@ public abstract class ShulkerBoxBlockEntityRendererMixin implements IDecoratedSh
 	@Inject(method="<init>(Lnet/minecraft/client/render/entity/model/LoadedEntityModels;)V", at=@At("TAIL"))
 	private void onInit(LoadedEntityModels models, CallbackInfo ci) {
 		DecoratedShulkerBoxesModClient.LOGGER.info("ShulkerBoxBlockEntityRenderer.onInit()");
-		this.lid = this.model.getPart("lid").get();
-		this.base = this.model.getPart("base").get();
+		ModelPart root = this.model.getRootPart();
+		this.lid = root.getChild("lid");
+		this.base = root.getChild("base");
 	}
 
 	private void renderModel(MatrixStack matrices, VertexConsumerProvider provider, int light, int overlay, float openness, SpriteIdentifier lidId, SpriteIdentifier baseId) {

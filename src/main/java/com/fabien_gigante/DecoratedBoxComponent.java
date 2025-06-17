@@ -9,11 +9,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.component.ComponentType;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.storage.WriteView;
+import net.minecraft.storage.ReadView;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.Identifier;
 
@@ -45,15 +44,14 @@ public record DecoratedBoxComponent(DyeColor secondaryColor, ItemStack displayed
     public DecoratedBoxComponent setSecondaryColor(DyeColor secondaryColor) { return new DecoratedBoxComponent(secondaryColor, displayedItem); }
     public DecoratedBoxComponent setDisplayedItem(ItemStack displayedItem) { return new DecoratedBoxComponent(secondaryColor, displayedItem); }
 
-	public static DecoratedBoxComponent readNbt(NbtCompound nbt, WrapperLookup lookup) {
-		return CODEC.parse(lookup.getOps(NbtOps.INSTANCE), nbt.get(ID.toString())).resultOrPartial().orElse(DEFAULT);
+	public static DecoratedBoxComponent readData(ReadView view) {
+        return view.read(ID.toString(), CODEC).orElse(DEFAULT);
 	}
 
-	public NbtCompound writeNbt(NbtCompound nbt, WrapperLookup lookup) {
-		if (isEmpty()) removeNbt(nbt);
-        else nbt.put(ID.toString(), CODEC.encodeStart(lookup.getOps(NbtOps.INSTANCE), this).getOrThrow());
-        return nbt;
+	public void writeData(WriteView view) {
+		if (isEmpty()) removeData(view);
+        else view.put(ID.toString(), CODEC, this);
 	}
 
-    static public void removeNbt(NbtCompound nbt) { nbt.remove(ID.toString()); }
+    static public void removeData(WriteView view) { view.remove(ID.toString()); }
 }
