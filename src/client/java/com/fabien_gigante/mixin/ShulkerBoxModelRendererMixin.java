@@ -5,8 +5,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Final;
 
 import net.minecraft.client.render.TexturedRenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.ShulkerBoxBlockEntityRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
 import net.minecraft.client.render.item.model.special.ShulkerBoxModelRenderer;
 import net.minecraft.client.render.item.model.special.SimpleSpecialModelRenderer;
 import net.minecraft.client.util.SpriteIdentifier;
@@ -39,8 +39,9 @@ public abstract class ShulkerBoxModelRendererMixin implements SimpleSpecialModel
 	}
 
     @Override
-	public void render(ItemDisplayContext displayContext, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay, boolean glint) {
+	public void render(ItemDisplayContext displayContext, MatrixStack matrices, OrderedRenderCommandQueue queue, int light, int overlay, boolean glint, int tintedColor) {
         IDecoratedShulkerBoxBlockEntityRenderer renderer = (IDecoratedShulkerBoxBlockEntityRenderer)this.blockEntityRenderer;
-        renderer.render(matrices, vertexConsumers, light, overlay, this.facing, this.openness, this.textureId, this.secondaryId, this.displayedItem);
+        renderer.render(matrices, queue, light, overlay, this.facing, this.openness, tintedColor, this.textureId, this.secondaryId, this.displayedItem);
 	}
+
 }

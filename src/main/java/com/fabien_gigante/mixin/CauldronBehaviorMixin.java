@@ -30,7 +30,7 @@ import com.fabien_gigante.DecoratedBoxItemStack;
 public interface CauldronBehaviorMixin {
     @Inject(method="cleanShulkerBox", at = @At("RETURN"), cancellable = true)
 	private static void cleanShulkerBox(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack, CallbackInfoReturnable<ActionResult> ci) {
-        if (ci.getReturnValue() != ActionResult.PASS && !world.isClient)
+        if (ci.getReturnValue() != ActionResult.PASS && !world.isClient())
             new DecoratedBoxItemStack(player.getStackInHand(hand)).setSecondaryColor(null);
     }
 
@@ -44,7 +44,7 @@ public interface CauldronBehaviorMixin {
 	private static ActionResult cleanBundle(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, ItemStack stack) {
 		if (!stack.isIn(ItemTags.BUNDLES) || stack.isOf(Items.BUNDLE))
 			return ActionResult.PASS_TO_DEFAULT_BLOCK_ACTION;
-		if (!world.isClient) {
+		if (!world.isClient()) {
 			ItemStack itemStack = stack.copyComponentsToNewStack(Items.BUNDLE, 1);
 			player.setStackInHand(hand, ItemUsage.exchangeStack(stack, player, itemStack, false));
 			LeveledCauldronBlock.decrementFluidLevel(state, world, pos);

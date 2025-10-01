@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.util.DyeColor;
 import net.minecraft.loot.LootTable;
+import net.minecraft.loot.context.LootContextParameters;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.component.ComponentType;
 import net.minecraft.loot.function.CopyComponentsLootFunction;
@@ -38,10 +39,9 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 		LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
 			if (source.isBuiltin() && SHULKER_BOX_LOOT_TABLES.contains(key))
 				builder.apply(
-					CopyComponentsLootFunction
-					.builder(CopyComponentsLootFunction.Source.BLOCK_ENTITY)
+					CopyComponentsLootFunction.blockEntity(LootContextParameters.BLOCK_ENTITY)
 					.include(DECORATED_BOX_TYPE)
-				);    
+				);
 		});
 	}
 }
