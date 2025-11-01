@@ -7,9 +7,14 @@ Too many shulker boxes in your inventory or ender chest ? Always confusing them 
 Simply combine a shulker box with two dyes (instead of a single one) in your craft. The resulting dyed shulker box will have both colors. The primary dye determines its lid color, the secondary dye its base color. 
 Both colors are removed when the shulker box is washed in a water cauldron.
 
+![image](https://github.com/user-attachments/assets/af7593e0-ae4e-4751-94fc-2c5ba8bad7c1)
+
 Use an anvil to forge an arbitrary item into the shulker box's lid acting as an icon label for the box. Items forged into shulker boxes are consumed in this process. Items forged into shulker boxes can be unforged and recovered using a grinding stone.
 
 ![image](https://github.com/user-attachments/assets/ac1075b6-d460-44d1-83bc-d652921db553)
-![image](https://github.com/user-attachments/assets/af7593e0-ae4e-4751-94fc-2c5ba8bad7c1)
 
-<a href="https://fabricmc.net/"><img src="https://camo.githubusercontent.com/c3bd078e17143a3ed2bd5f424f847f494f87d5c70207670cdee2ed8eaf377c85/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f6e706d2f40696e746572677261762f646576696e732d62616467657340332f6173736574732f636f7a792f737570706f727465642f6661627269635f3634682e706e67" alt="Available for Fabric" width="200"></a>           
+Additionally, the container screens of shulker boxes are colored according to their main dye.
+
+<img width="352" alt="image" src="https://github.com/user-attachments/assets/932b7438-7998-4add-b7b7-8943ee7b1cf3" />
+
+<a href="https://fabricmc.net/"><img src="https://camo.githubusercontent.com/c3bd078e17143a3ed2bd5f424f847f494f87d5c70207670cdee2ed8eaf377c85/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f6e706d2f40696e746572677261762f646576696e732d62616467657340332f6173736574732f636f7a792f737570706f727465642f6661627269635f3634682e706e67" alt="Available for Fabric" width="200"></a>
