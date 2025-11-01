@@ -1,0 +1,9 @@
+package com.fabien_gigante;
+
+import net.minecraft.util.DyeColor;
+
+// Interface to color information 
+public interface IDyed {
+	public void setColor(DyeColor color);
+	public DyeColor getColor();
+}

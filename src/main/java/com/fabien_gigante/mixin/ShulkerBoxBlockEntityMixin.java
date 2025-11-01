@@ -6,6 +6,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -14,11 +15,13 @@ import net.minecraft.block.entity.LockableContainerBlockEntity;
 import net.minecraft.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.component.ComponentMap;
 import net.minecraft.component.ComponentsAccess;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.registry.RegistryWrapper.WrapperLookup;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.storage.WriteView;
 import net.minecraft.storage.ReadView;
 import net.minecraft.util.DyeColor;
@@ -26,6 +29,7 @@ import net.minecraft.util.math.BlockPos;
 
 import com.fabien_gigante.DecoratedBoxComponent;
 import com.fabien_gigante.IDecoratedBox;
+import com.fabien_gigante.IDyed;
 
 @Mixin(ShulkerBoxBlockEntity.class)
 public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockEntity implements IDecoratedBox {
@@ -79,5 +83,10 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 	public void removeFromCopiedStackData(WriteView view) {
 		super.removeFromCopiedStackData(view);
 		DecoratedBoxComponent.removeData(view);
+	}
+
+	@Inject(method = "createScreenHandler", at = @At("RETURN"))
+	protected void createScreenHandler(int syncId, PlayerInventory playerInventory, CallbackInfoReturnable<ScreenHandler> cir) {
+		if (cir.getReturnValue() instanceof IDyed dyed) dyed.setColor(getColor());
 	}
 }

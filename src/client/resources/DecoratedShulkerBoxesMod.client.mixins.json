@@ -4,7 +4,8 @@
 	"compatibilityLevel": "JAVA_21",
 	"client": [
 		"ShulkerBoxBlockEntityRendererMixin",
-		"ShulkerBoxModelRendererUnbakedMixin"
+		"ShulkerBoxModelRendererUnbakedMixin",
+		"ShulkerBoxScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
