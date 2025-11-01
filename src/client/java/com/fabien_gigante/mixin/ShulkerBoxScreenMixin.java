@@ -5,6 +5,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import com.fabien_gigante.DecoratedShulkerBoxesModClient;
 import com.fabien_gigante.IDyed;
 
 import net.minecraft.client.gl.RenderPipelines;
@@ -20,20 +21,32 @@ import net.minecraft.util.math.ColorHelper;
 
 @Mixin(ShulkerBoxScreen.class)
 public abstract class ShulkerBoxScreenMixin extends HandledScreen<ShulkerBoxScreenHandler> {
-    private static final Identifier TEXTURE = Identifier.ofVanilla("textures/gui/container/shulker_box.png");
+    private static final Identifier DYED_TEXTURE = Identifier.of(DecoratedShulkerBoxesModClient.MOD_ID, "textures/gui/container/dyed_shulker_box.png");
     private static final int DEFAULT_COLOR = 0x976797;
-    private static final int ALPHA = 0xff;
 
     public ShulkerBoxScreenMixin(ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title) { super(handler, inventory, title); }
 
-    @Inject(method="drawBackground", at=@At("TAIL"))
-    protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
-        if (this.handler instanceof IDyed dyed) {
-            DyeColor dye = dyed.getColor();
-            int color = ColorHelper.withAlpha(ALPHA, dye == null ? DEFAULT_COLOR : dye.getEntityColor()); 
-            int x = 8-2, y = 18-2, w = 9*18+2, h = 3*18+2;
-            context.drawTexture(RenderPipelines.GUI_TEXTURED, TEXTURE, this.x + x, this.y + y, x, y, w, h, 256, 256, color);
-        }
+    private int getColor() {
+        if (!(this.handler instanceof IDyed dyed)) return 0;
+        DyeColor dye = dyed.getColor();
+        return ColorHelper.fullAlpha(dye == null ? DEFAULT_COLOR : dye.getEntityColor()); 
+    }
+    private static boolean isDarkColor(int color) {
+        return ColorHelper.getAlpha(color) > 0 && ColorHelper.getBlue(ColorHelper.grayscale(color)) < 160;
     }
 
+    @Inject(method="drawBackground", at=@At("TAIL"))
+    protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
+        int color = getColor();
+        if (color != 0)
+            context.drawTexture(RenderPipelines.GUI_TEXTURED, DYED_TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256, color);
+    }
+
+    @Override
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+        int color = getColor();
+        if (isDarkColor(color))
+            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0xffffffff, false);
+    }
 }
