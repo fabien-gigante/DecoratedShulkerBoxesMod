@@ -15,6 +15,6 @@ Use an anvil to forge an arbitrary item into the shulker box's lid acting as an 
 
 Additionally, the container screens of shulker boxes are colored according to their main dye.
 
-<img width="352" alt="image" src="https://github.com/user-attachments/assets/932b7438-7998-4add-b7b7-8943ee7b1cf3" />
+![image](https://github.com/user-attachments/assets/3b996a85-e44e-4037-9324-b5720bcff48d)
 
 <a href="https://fabricmc.net/"><img src="https://camo.githubusercontent.com/c3bd078e17143a3ed2bd5f424f847f494f87d5c70207670cdee2ed8eaf377c85/68747470733a2f2f63646e2e6a7364656c6976722e6e65742f6e706d2f40696e746572677261762f646576696e732d62616467657340332f6173736574732f636f7a792f737570706f727465642f6661627269635f3634682e706e67" alt="Available for Fabric" width="200"></a>
