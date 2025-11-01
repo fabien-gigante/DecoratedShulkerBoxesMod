@@ -32,7 +32,7 @@ public abstract class ShulkerBoxScreenMixin extends HandledScreen<ShulkerBoxScre
         return ColorHelper.fullAlpha(dye == null ? DEFAULT_COLOR : dye.getEntityColor()); 
     }
     private static boolean isDarkColor(int color) {
-        return ColorHelper.getAlpha(color) > 0 && ColorHelper.getBlue(ColorHelper.grayscale(color)) < 160;
+        return ColorHelper.getBlue(ColorHelper.grayscale(color)) < 160;
     }
 
     @Inject(method="drawBackground", at=@At("TAIL"))
@@ -44,9 +44,13 @@ public abstract class ShulkerBoxScreenMixin extends HandledScreen<ShulkerBoxScre
 
     @Override
     protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        super.drawForeground(context, mouseX, mouseY);
         int color = getColor();
-        if (isDarkColor(color))
-            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY, 0xffffffff, false);
+        if (color == 0)
+            super.drawForeground(context, mouseX, mouseY);
+        else {
+            int titleColor = isDarkColor(color) ? 0xffffffff : 0xff404040;
+            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY + 1, titleColor, false);
+            context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY + 1, 0xff404040, false);
+        }
     }
 }
