@@ -10,9 +10,8 @@ import net.minecraft.item.ItemDisplayContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.Direction;
-
-import java.util.Set;
-import org.joml.Vector3f;
+import java.util.function.Consumer;
+import org.joml.Vector3fc;
 
 public class DecoratedShulkerBoxModelRenderer implements SpecialModelRenderer<DecoratedBoxComponent> {
    private final ShulkerBoxBlockEntityRenderer blockEntityRenderer;
@@ -27,7 +26,7 @@ public class DecoratedShulkerBoxModelRenderer implements SpecialModelRenderer<De
       this.textureId = textureId;
    }
 
-   public void collectVertices(Set<Vector3f> vertices) {
+   public void collectVertices(Consumer<Vector3fc> vertices) {
       this.blockEntityRenderer.collectVertices(this.facing, this.openness, vertices);
    }
 
