@@ -9,29 +9,28 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.resource.featuretoggle.FeatureFlags;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.loot.LootTable;
-import net.minecraft.loot.context.LootContextParameters;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.component.ComponentType;
-import net.minecraft.loot.function.CopyComponentsLootFunction;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
 public class DecoratedShulkerBoxesMod implements ModInitializer {
 	public static final String MOD_ID = "decorated-shulker-boxes";
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	
-    public static final ComponentType<DecoratedBoxComponent> DECORATED_BOX_TYPE = DecoratedBoxComponent.TYPE;
-	public static final Map<DyeColor,ScreenHandlerType<ShulkerBoxScreenHandler>> SCREEN_HANDLER_TYPES = new HashMap<>();
+    public static final DataComponentType<DecoratedBoxComponent> DECORATED_BOX_TYPE = DecoratedBoxComponent.TYPE;
+	public static final Map<DyeColor,MenuType<ShulkerBoxMenu>> SCREEN_HANDLER_TYPES = new HashMap<>();
 
 	// Server-side mod entry point
 	@Override
@@ -43,25 +42,25 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 
 	private void registerScreens() {
 		for(DyeColor color : DyeColor.values()) {
-			var type = new ScreenHandlerType<>( (syncId, playerInventory) -> {
-				var handler = new ShulkerBoxScreenHandler(syncId, playerInventory);
+			var type = new MenuType<>( (syncId, playerInventory) -> {
+				var handler = new ShulkerBoxMenu(syncId, playerInventory);
 				if (handler instanceof IDyed dyed) dyed.setColor(color);
 				return handler;
-			}, FeatureFlags.VANILLA_FEATURES);
+			}, FeatureFlags.VANILLA_SET);
 			SCREEN_HANDLER_TYPES.put(color, type);
-			Registry.register(Registries.SCREEN_HANDLER, Identifier.of(MOD_ID, ShulkerBoxBlock.get(color).getTranslationKey()), type);
+			Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, ShulkerBoxBlock.getBlockByColor(color).getDescriptionId()), type);
 		}
 	}
 
 	private void updateLootTables() {
-		Set<RegistryKey<LootTable>> SHULKER_BOX_LOOT_TABLES = 
+		Set<ResourceKey<LootTable>> SHULKER_BOX_LOOT_TABLES = 
 			Stream.concat(Stream.of((DyeColor)null), Arrays.stream(DyeColor.values()))
-			.map(color -> ShulkerBoxBlock.get(color).getLootTableKey().orElseThrow())
+			.map(color -> ShulkerBoxBlock.getBlockByColor(color).getLootTable().orElseThrow())
 			.collect(Collectors.toSet());
 		LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
 			if (source.isBuiltin() && SHULKER_BOX_LOOT_TABLES.contains(key))
 				builder.apply(
-					CopyComponentsLootFunction.blockEntity(LootContextParameters.BLOCK_ENTITY)
+					CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
 					.include(DECORATED_BOX_TYPE)
 				);
 		});

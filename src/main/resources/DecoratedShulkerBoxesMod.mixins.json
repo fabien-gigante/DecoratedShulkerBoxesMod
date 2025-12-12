@@ -4,13 +4,13 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"ShulkerBoxBlockEntityMixin",
-		"ShulkerBoxScreenHandlerMixin",
+		"ShulkerBoxMenuMixin",
 		"TransmuteRecipeMixin",
-		"CauldronBehaviorMixin",
-		"AnvilScreenHandlerMixin",
-		"GrindstoneScreenHandlerMixin",
-		"GrindstoneScreenHandlerTopInputSlotMixin",
-		"GrindstoneScreenHandlerOutputSlotMixin"
+		"CauldronInteractionMixin",
+		"AnvilMenuMixin",
+		"GrindstoneMenuMixin",
+		"GrindstoneMenuTopInputSlotMixin",
+		"GrindstoneMenuOutputSlotMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

@@ -7,50 +7,49 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.fabien_gigante.DecoratedShulkerBoxesModClient;
 import com.fabien_gigante.IDyed;
-
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.ShulkerBoxScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.text.Text;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.item.DyeColor;
 
 @Mixin(ShulkerBoxScreen.class)
-public abstract class ShulkerBoxScreenMixin extends HandledScreen<ShulkerBoxScreenHandler> {
-    private static final Identifier DYED_TEXTURE = Identifier.of(DecoratedShulkerBoxesModClient.MOD_ID, "textures/gui/container/dyed_shulker_box.png");
+public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<ShulkerBoxMenu> {
+    private static final Identifier DYED_TEXTURE = Identifier.fromNamespaceAndPath(DecoratedShulkerBoxesModClient.MOD_ID, "textures/gui/container/dyed_shulker_box.png");
     private static final int DEFAULT_COLOR = 0x976797;
 
-    public ShulkerBoxScreenMixin(ShulkerBoxScreenHandler handler, PlayerInventory inventory, Text title) { super(handler, inventory, title); }
+    public ShulkerBoxScreenMixin(ShulkerBoxMenu handler, Inventory inventory, Component title) { super(handler, inventory, title); }
 
     private int getColor() {
-        if (!(this.handler instanceof IDyed dyed)) return 0;
+        if (!(this.menu instanceof IDyed dyed)) return 0;
         DyeColor dye = dyed.getColor();
-        return ColorHelper.fullAlpha(dye == null ? DEFAULT_COLOR : dye.getEntityColor()); 
+        return ARGB.opaque(dye == null ? DEFAULT_COLOR : dye.getTextureDiffuseColor()); 
     }
     private static boolean isDarkColor(int color) {
-        return ColorHelper.getBlue(ColorHelper.grayscale(color)) < 160;
+        return ARGB.blue(ARGB.greyscale(color)) < 160;
     }
 
-    @Inject(method="drawBackground", at=@At("TAIL"))
-    protected void drawBackground(DrawContext context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method="renderBg", at=@At("TAIL"))
+    protected void drawBackground(GuiGraphics context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
         int color = getColor();
         if (color != 0)
-            context.drawTexture(RenderPipelines.GUI_TEXTURED, DYED_TEXTURE, this.x, this.y, 0, 0, this.backgroundWidth, this.backgroundHeight, 256, 256, color);
+            context.blit(RenderPipelines.GUI_TEXTURED, DYED_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256, color);
     }
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         int color = getColor();
         if (color == 0)
-            super.drawForeground(context, mouseX, mouseY);
+            super.renderLabels(context, mouseX, mouseY);
         else {
             int titleColor = isDarkColor(color) ? 0xffffffff : 0xff404040;
-            context.drawText(this.textRenderer, this.title, this.titleX, this.titleY + 1, titleColor, false);
-            context.drawText(this.textRenderer, this.playerInventoryTitle, this.playerInventoryTitleX, this.playerInventoryTitleY + 1, 0xff404040, false);
+            context.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY + 1, titleColor, false);
+            context.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY + 1, 0xff404040, false);
         }
     }
 }

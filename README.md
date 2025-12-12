@@ -7,11 +7,11 @@ Too many shulker boxes in your inventory or ender chest ? Always confusing them 
 Simply combine a shulker box with two dyes (instead of a single one) in your craft. The resulting dyed shulker box will have both colors. The primary dye determines its lid color, the secondary dye its base color. 
 Both colors are removed when the shulker box is washed in a water cauldron.
 
-![image](https://github.com/user-attachments/assets/af7593e0-ae4e-4751-94fc-2c5ba8bad7c1)
+![image](https://github.com/user-attachments/assets/ac1075b6-d460-44d1-83bc-d652921db553)
 
 Use an anvil to forge an arbitrary item into the shulker box's lid acting as an icon label for the box. Items forged into shulker boxes are consumed in this process. Items forged into shulker boxes can be unforged and recovered using a grinding stone.
 
-![image](https://github.com/user-attachments/assets/ac1075b6-d460-44d1-83bc-d652921db553)
+![image](https://github.com/user-attachments/assets/af7593e0-ae4e-4751-94fc-2c5ba8bad7c1)
 
 Additionally, the container screens of shulker boxes are colored according to their main dye.
 

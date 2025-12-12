@@ -1,7 +1,7 @@
 package com.fabien_gigante;
 
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 
 // Interface to decoration information 
 public interface IDecoratedBox {

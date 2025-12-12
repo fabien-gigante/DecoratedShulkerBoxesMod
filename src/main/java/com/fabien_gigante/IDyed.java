@@ -1,6 +1,6 @@
 package com.fabien_gigante;
 
-import net.minecraft.util.DyeColor;
+import net.minecraft.world.item.DyeColor;
 
 // Interface to color information 
 public interface IDyed {

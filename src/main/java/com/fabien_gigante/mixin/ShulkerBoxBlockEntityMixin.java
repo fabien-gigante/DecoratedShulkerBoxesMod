@@ -7,32 +7,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.block.entity.LockableContainerBlockEntity;
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
-import net.minecraft.component.ComponentMap;
-import net.minecraft.component.ComponentsAccess;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.listener.ClientPlayPacketListener;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.registry.RegistryWrapper.WrapperLookup;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.storage.WriteView;
-import net.minecraft.storage.ReadView;
-import net.minecraft.util.DyeColor;
-import net.minecraft.util.math.BlockPos;
-
 import com.fabien_gigante.DecoratedBoxComponent;
 import com.fabien_gigante.IDecoratedBox;
 import com.fabien_gigante.IDyed;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 @Mixin(ShulkerBoxBlockEntity.class)
-public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockEntity implements IDecoratedBox {
+public abstract class ShulkerBoxBlockEntityMixin extends BaseContainerBlockEntity implements IDecoratedBox {
 	@Unique
 	private DecoratedBoxComponent decorations = DecoratedBoxComponent.DEFAULT;
 
@@ -47,46 +45,46 @@ public abstract class ShulkerBoxBlockEntityMixin extends LockableContainerBlockE
 
 	// Persistency
 	
-	@Inject(method = "readData", at = @At("TAIL"))
-	protected void readData(ReadView view, CallbackInfo ci) {
+	@Inject(method = "loadAdditional", at = @At("TAIL"))
+	protected void loadDecorations(ValueInput view, CallbackInfo ci) {
 		this.decorations =	DecoratedBoxComponent.readData(view);
 	}
 
-	@Inject(method = "writeData", at = @At("TAIL"))
-	protected void writeData(WriteView view, CallbackInfo ci) {
+	@Inject(method = "saveAdditional", at = @At("TAIL"))
+	protected void saveDecorations(ValueOutput view, CallbackInfo ci) {
 		this.decorations.writeData(view);
 	}
 	
 	@Override
-	public NbtCompound toInitialChunkDataNbt(WrapperLookup lookup) {
-		return createNbt(lookup);
+	public CompoundTag getUpdateTag(Provider lookup) {
+		return saveWithoutMetadata(lookup);
 	}
 
 	@Override
-	public Packet<ClientPlayPacketListener> toUpdatePacket() {
-		return BlockEntityUpdateS2CPacket.create((BlockEntity)(Object)this);
+	public Packet<ClientGamePacketListener> getUpdatePacket() {
+		return ClientboundBlockEntityDataPacket.create((BlockEntity)(Object)this);
 	}
 
 	@Override
-	public void readComponents(ComponentsAccess components) {
-		super.readComponents(components);
+	public void applyImplicitComponents(DataComponentGetter components) {
+		super.applyImplicitComponents(components);
 		this.decorations = components.getOrDefault(DecoratedBoxComponent.TYPE, DecoratedBoxComponent.DEFAULT);
 	}
  
 	@Override
-	public void addComponents(ComponentMap.Builder builder) {
-		super.addComponents(builder);
-		builder.add(DecoratedBoxComponent.TYPE, this.decorations.orNull());
+	public void collectImplicitComponents(DataComponentMap.Builder builder) {
+		super.collectImplicitComponents(builder);
+		builder.set(DecoratedBoxComponent.TYPE, this.decorations.orNull());
 	}
 
 	@Override
-	public void removeFromCopiedStackData(WriteView view) {
-		super.removeFromCopiedStackData(view);
+	public void removeComponentsFromTag(ValueOutput view) {
+		super.removeComponentsFromTag(view);
 		DecoratedBoxComponent.removeData(view);
 	}
 
-	@Inject(method = "createScreenHandler", at = @At("RETURN"))
-	protected void createScreenHandler(int syncId, PlayerInventory playerInventory, CallbackInfoReturnable<ScreenHandler> cir) {
+	@Inject(method = "createMenu", at = @At("RETURN"))
+	protected void setMenuColor(int syncId, Inventory playerInventory, CallbackInfoReturnable<AbstractContainerMenu> cir) {
 		if (cir.getReturnValue() instanceof IDyed dyed) dyed.setColor(getColor());
 	}
 }

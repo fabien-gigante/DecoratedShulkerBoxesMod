@@ -8,39 +8,37 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GrindstoneScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.screen.slot.Slot;
-
 import com.fabien_gigante.DecoratedBoxItemStack;
-import com.fabien_gigante.IScreenHandlerSlotListener;
+import com.fabien_gigante.ISlotListener;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.minecraft.world.inventory.GrindstoneMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-@Mixin(GrindstoneScreenHandler.class)
-public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler implements IScreenHandlerSlotListener {
-	@Shadow @Final Inventory input;
-	@Unique @Final PlayerEntity player;
-	@Shadow @Final ScreenHandlerContext context;    
+@Mixin(GrindstoneMenu.class)
+public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implements ISlotListener {
+	@Shadow @Final Container repairSlots;
+	@Unique @Final Player player;
+	@Shadow @Final ContainerLevelAccess access;    
 
-	protected GrindstoneScreenHandlerMixin(ScreenHandlerType<?> type, int syncId) {
+	protected GrindstoneMenuMixin(MenuType<?> type, int syncId) {
 		super(type, syncId);
 	}
 
 	// Locally cache the player (as Anvil does)
-	@Inject(method = "<init>(ILnet/minecraft/entity/player/PlayerInventory;Lnet/minecraft/screen/ScreenHandlerContext;)V", at = @At("TAIL"))
-	private void onInit(int syncId, PlayerInventory playerInventory, ScreenHandlerContext context, CallbackInfo info) {
+	@Inject(method = "<init>(ILnet/minecraft/world/entity/player/Inventory;Lnet/minecraft/world/inventory/ContainerLevelAccess;)V", at = @At("TAIL"))
+	private void onInit(int syncId, Inventory playerInventory, ContainerLevelAccess context, CallbackInfo info) {
 		this.player = playerInventory.player;
 	}
 
 	// Produce a unforged shulker box when possible
-	@Inject(method={"getOutputStack"}, at={@At(value="RETURN")}, cancellable = true)
-	private void getOutputStack(ItemStack firstInput, ItemStack secondInput, CallbackInfoReturnable<ItemStack> ci) {
+	@Inject(method={"computeResult"}, at={@At(value="RETURN")}, cancellable = true)
+	private void computeShulkerBox(ItemStack firstInput, ItemStack secondInput, CallbackInfoReturnable<ItemStack> ci) {
 		ItemStack returnValue = ci.getReturnValue();
 		if (returnValue != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return;
 		returnValue = firstInput.copy();
@@ -54,10 +52,10 @@ public abstract class GrindstoneScreenHandlerMixin extends ScreenHandler impleme
 	}
 
 	// Give back the previous decoration item to the player
-	public void onTakeOutput(PlayerEntity player, ItemStack stack) {
-		ItemStack firstInput = input.getStack(0);
+	public void onTakeOutput(Player player, ItemStack stack) {
+		ItemStack firstInput = repairSlots.getItem(0);
 		if (isForgedShulkerBox(firstInput))
-			this.context.run((world,pos) -> new DecoratedBoxItemStack(firstInput).dropDisplayedItem(world, pos, player));
+			this.access.execute((world,pos) -> new DecoratedBoxItemStack(firstInput).dropDisplayedItem(world, pos, player));
 	}
 
 	@Unique
