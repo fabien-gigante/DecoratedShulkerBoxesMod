@@ -10,7 +10,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.ISlotListener;
 
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -31,25 +30,19 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	@Inject(method={"computeResult"}, at={@At(value="RETURN")}, cancellable = true)
 	private void computeShulkerBox(ItemStack firstInput, ItemStack secondInput, CallbackInfoReturnable<ItemStack> ci) {
 		ItemStack result = ci.getReturnValue();
-		if (result != ItemStack.EMPTY) return;
-		if (isValidShulkerBoxRecipe(firstInput, secondInput)) {
-			result = firstInput.copy();
-			new DecoratedBoxItemStack(result).setDisplayedItem(null);
-			ci.setReturnValue(result);
-		} else if (isValidLodestoneTrackerRecipe(firstInput, secondInput)) {
-			result = firstInput.copy();
-			result.remove(DataComponents.LODESTONE_TRACKER);
-			ci.setReturnValue(result);
-		}
+		if (result != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return;
+		result = firstInput.copy();
+		new DecoratedBoxItemStack(result).setDisplayedItem(null);
+		ci.setReturnValue(result);
 	}
 
-	// Allow forged shulker and lodestone compass to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)
-	public boolean isValid(Slot slot, ItemStack stack) {
-		return slot == this.getSlot(0) && (isForgedShulkerBox(stack) || hasLodestoneTracker(stack));
+	// Allow forged shulker to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)
+	public boolean isValidSlot(Slot slot, ItemStack stack) {
+		return slot == this.getSlot(0) && isForgedShulkerBox(stack);
 	}
 
 	// Give back the previous decoration item to the player
-	public void onTake(Player player, ItemStack stack) {
+	public void onTakeSlot(Player player, ItemStack stack) {
 		ItemStack firstInput = repairSlots.getItem(0);
 		if (isForgedShulkerBox(firstInput))
 			this.access.execute((world,pos) -> new DecoratedBoxItemStack(firstInput).dropDisplayedItem(world, pos, player));
@@ -64,14 +57,4 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	private boolean isValidShulkerBoxRecipe(ItemStack firstInput, ItemStack secondInput) {
 		return (secondInput == null || secondInput.isEmpty()) && isForgedShulkerBox(firstInput);
 	}
-
-	@Unique
-	private boolean hasLodestoneTracker(ItemStack stack) {
-		return stack.get(DataComponents.LODESTONE_TRACKER) != null;
-	}
-
-	@Unique
-	private boolean isValidLodestoneTrackerRecipe(ItemStack firstInput, ItemStack secondInput) {
-		return (secondInput == null || secondInput.isEmpty()) && hasLodestoneTracker(firstInput);
-	}	
 }

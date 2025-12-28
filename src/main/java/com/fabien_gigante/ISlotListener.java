@@ -5,6 +5,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public interface ISlotListener {
-	public default boolean isValid(Slot slot, ItemStack stack) { return false; }
-	public default void onTake(Player player, ItemStack stack) {}
+	public default boolean isValidSlot(Slot slot, ItemStack stack) { return false; }
+	public default void onTakeSlot(Player player, ItemStack stack) {}
 }
