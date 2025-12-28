@@ -18,6 +18,6 @@ public class GrindstoneMenuOutputSlotMixin {
 	// Call back to the parent (similar to what the Anvil does in vanilla)
 	@Inject(method = "onTake", at = @At(value = "HEAD"))
 	private void onTake(Player player, ItemStack resultStack, CallbackInfo ci) {
-		((ISlotListener)field_16780).onTakeOutput(player, resultStack);
+		((ISlotListener)field_16780).onTake(player, resultStack);
 	}
 }

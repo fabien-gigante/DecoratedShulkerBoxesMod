@@ -55,12 +55,12 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	}
 
 	// Allow forged shulker and lodestone compass to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)
-	public boolean isValidInput(Slot slot, ItemStack stack) {
+	public boolean isValid(Slot slot, ItemStack stack) {
 		return slot == this.getSlot(0) && (isForgedShulkerBox(stack) || hasLodestoneTracker(stack));
 	}
 
 	// Give back the previous decoration item to the player
-	public void onTakeOutput(Player player, ItemStack stack) {
+	public void onTake(Player player, ItemStack stack) {
 		ItemStack firstInput = repairSlots.getItem(0);
 		if (isForgedShulkerBox(firstInput))
 			this.access.execute((world,pos) -> new DecoratedBoxItemStack(firstInput).dropDisplayedItem(world, pos, player));
@@ -80,7 +80,7 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	private boolean hasLodestoneTracker(ItemStack stack) {
 		return stack.get(DataComponents.LODESTONE_TRACKER) != null;
 	}
-	
+
 	@Unique
 	private boolean isValidLodestoneTrackerRecipe(ItemStack firstInput, ItemStack secondInput) {
 		return (secondInput == null || secondInput.isEmpty()) && hasLodestoneTracker(firstInput);

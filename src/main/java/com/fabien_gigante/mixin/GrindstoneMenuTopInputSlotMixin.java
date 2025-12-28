@@ -28,6 +28,6 @@ public class GrindstoneMenuTopInputSlotMixin extends Slot {
 	// Grindstone parent can allow additional items as input 
 	@Inject(method = "mayPlace", at = @At(value = "TAIL"), cancellable=true)
 	private void mayPlace(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
-		ci.setReturnValue( ci.getReturnValue() || ((ISlotListener)grindstoneHandler).isValidInput(this, stack));
+		ci.setReturnValue( ci.getReturnValue() || ((ISlotListener)grindstoneHandler).isValid(this, stack));
 	}
 }

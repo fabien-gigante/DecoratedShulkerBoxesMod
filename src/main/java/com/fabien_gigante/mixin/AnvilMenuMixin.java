@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import com.fabien_gigante.DecoratedBoxItemStack;
-import com.fabien_gigante.ISlotListener;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.ItemTags;
@@ -25,7 +24,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 
 @Mixin(AnvilMenu.class)
-public abstract class AnvilMenuMixin extends ItemCombinerMenu implements ISlotListener {
+public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 	@Shadow	private int repairItemCountCost;
 	@Shadow @Final private DataSlot cost;
 	@Shadow @Nullable private String itemName;
