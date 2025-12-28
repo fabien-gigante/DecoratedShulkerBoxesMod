@@ -10,6 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.ISlotListener;
+
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,15 +42,21 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	@Inject(method={"computeResult"}, at={@At(value="RETURN")}, cancellable = true)
 	private void computeShulkerBox(ItemStack firstInput, ItemStack secondInput, CallbackInfoReturnable<ItemStack> ci) {
 		ItemStack returnValue = ci.getReturnValue();
-		if (returnValue != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return;
-		returnValue = firstInput.copy();
-		new DecoratedBoxItemStack(returnValue).setDisplayedItem(null);
-		ci.setReturnValue(returnValue);
+		if (returnValue != ItemStack.EMPTY) return;
+		if (isValidShulkerBoxRecipe(firstInput, secondInput)) {
+			returnValue = firstInput.copy();
+			new DecoratedBoxItemStack(returnValue).setDisplayedItem(null);
+			ci.setReturnValue(returnValue);
+		} else if (isValidLodestoneTrackerRecipe(firstInput, secondInput)) {
+			returnValue = firstInput.copy();
+			returnValue.remove(DataComponents.LODESTONE_TRACKER);
+			ci.setReturnValue(returnValue);
+		}
 	}
 
-	// Allow forged shulker to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)
+	// Allow forged shulker and lodestone compass to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)
 	public boolean isValidInput(Slot slot, ItemStack stack) {
-		return slot == this.getSlot(0) && isForgedShulkerBox(stack);
+		return slot == this.getSlot(0) && (isForgedShulkerBox(stack) || hasLodestoneTracker(stack));
 	}
 
 	// Give back the previous decoration item to the player
@@ -67,4 +75,14 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	private boolean isValidShulkerBoxRecipe(ItemStack firstInput, ItemStack secondInput) {
 		return (secondInput == null || secondInput.isEmpty()) && isForgedShulkerBox(firstInput);
 	}
+
+	@Unique
+	private boolean hasLodestoneTracker(ItemStack stack) {
+		return stack.get(DataComponents.LODESTONE_TRACKER) != null;
+	}
+	
+	@Unique
+	private boolean isValidLodestoneTrackerRecipe(ItemStack firstInput, ItemStack secondInput) {
+		return (secondInput == null || secondInput.isEmpty()) && hasLodestoneTracker(firstInput);
+	}	
 }
