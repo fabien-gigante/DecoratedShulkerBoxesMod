@@ -29,7 +29,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 	@Shadow @Final private DataSlot cost;
 	@Shadow @Nullable private String itemName;
 
-	public AnvilMenuMixin(@Nullable MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
+	protected AnvilMenuMixin(@Nullable MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
 		super(type, syncId, playerInventory, context, forgingSlotsManager);
 	}
    
@@ -51,10 +51,8 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 	@Unique
 	public void renameItem(ItemStack stack, ItemStack ingredient) {
 		boolean hasEmptyName = this.itemName == null || StringUtil.isBlank((String)this.itemName);
-		if (hasEmptyName)
-			stack.remove(DataComponents.CUSTOM_NAME);
-		else
-			stack.set(DataComponents.CUSTOM_NAME, Component.literal((String)this.itemName));
+		if (hasEmptyName) stack.remove(DataComponents.CUSTOM_NAME);
+		else stack.set(DataComponents.CUSTOM_NAME, Component.literal((String)this.itemName));
 	}
 
 	// Give back the previous decoration item to the player if needed
