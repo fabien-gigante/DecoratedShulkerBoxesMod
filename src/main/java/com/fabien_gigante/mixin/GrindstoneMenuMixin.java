@@ -5,10 +5,9 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.fabien_gigante.DecoratedBoxItemStack;
 import com.fabien_gigante.ISlotListener;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -27,13 +26,12 @@ public abstract class GrindstoneMenuMixin extends AbstractContainerMenu implemen
 	protected GrindstoneMenuMixin(MenuType<?> type, int syncId) { super(type, syncId); }
 
 	// Produce a unforged shulker box when possible
-	@Inject(method={"computeResult"}, at={@At(value="RETURN")}, cancellable = true)
-	private void computeShulkerBox(ItemStack firstInput, ItemStack secondInput, CallbackInfoReturnable<ItemStack> ci) {
-		ItemStack result = ci.getReturnValue();
-		if (result != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return;
-		result = firstInput.copy();
+	@ModifyReturnValue(method = "computeResult", at = @At("RETURN"))
+	private ItemStack modifyResult(ItemStack original, ItemStack firstInput, ItemStack secondInput) {
+		if (original != ItemStack.EMPTY || !isValidShulkerBoxRecipe(firstInput, secondInput)) return original;
+		ItemStack result = firstInput.copy();
 		new DecoratedBoxItemStack(result).setDisplayedItem(null);
-		ci.setReturnValue(result);
+		return result;
 	}
 
 	// Allow forged shulker to be grinded (see GrindstoneScreenHandlerTopInputSlotMixin)

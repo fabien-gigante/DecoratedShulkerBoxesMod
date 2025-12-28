@@ -6,8 +6,9 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.fabien_gigante.ISlotListener;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.Slot;
@@ -26,8 +27,8 @@ public class GrindstoneMenuTopInputSlotMixin extends Slot {
 	}
 
 	// Grindstone parent can allow additional items as input 
-	@Inject(method = "mayPlace", at = @At(value = "TAIL"), cancellable=true)
-	private void mayPlace(ItemStack stack, CallbackInfoReturnable<Boolean> ci) {
-		ci.setReturnValue( ci.getReturnValue() || ((ISlotListener)grindstoneHandler).isValidSlot(this, stack));
-	}
+	@ModifyReturnValue(method = "mayPlace", at = @At("RETURN"))
+	private boolean modifyMayPlace(boolean original, ItemStack stack) {
+		return original || ((ISlotListener) grindstoneHandler).isValidSlot(this, stack);
+	}	
 }
