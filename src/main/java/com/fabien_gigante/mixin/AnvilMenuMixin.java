@@ -41,7 +41,7 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu implements ISlotLi
 		ItemStack forged = this.inputSlots.getItem(0).copy(), ingredient = this.inputSlots.getItem(1);
 		if (ingredient != null && !ingredient.isEmpty())
 			new DecoratedBoxItemStack(forged).setDisplayedItem(ingredient.copyWithCount(1));
-		renameItem(forged);
+		renameItem(forged, ingredient);
 		this.resultSlots.setItem(0, forged);
 		this.cost.set(1);
 		this.repairItemCountCost = 1;
@@ -50,10 +50,11 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu implements ISlotLi
 	}
 
 	@Unique
-	public void renameItem(ItemStack stack) {
-		if (this.itemName == null || StringUtil.isBlank((String)this.itemName))
+	public void renameItem(ItemStack stack, ItemStack ingredient) {
+		boolean hasEmptyName = this.itemName == null || StringUtil.isBlank((String)this.itemName);
+		if (hasEmptyName)
 			stack.remove(DataComponents.CUSTOM_NAME);
-		else if (!this.itemName.equals(stack.getHoverName().getString())) // Test not relevant if client and server have different locales ?
+		else
 			stack.set(DataComponents.CUSTOM_NAME, Component.literal((String)this.itemName));
 	}
 

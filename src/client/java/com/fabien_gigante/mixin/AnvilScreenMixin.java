@@ -30,10 +30,11 @@ public abstract class AnvilScreenMixin extends AbstractContainerScreen<AnvilMenu
             this.shulkerBoxName = itemStack.is(ItemTags.SHULKER_BOXES) && !itemStack.has(DataComponents.CUSTOM_NAME) ? itemStack.getHoverName().getString() : "";
         if (i == 1)
             this.displayedItemName = itemStack.isEmpty() ? "" : itemStack.getHoverName().getString();
-        if ((i == 0 || i == 1) && !this.shulkerBoxName.isEmpty()) {
-			this.name.setValue(this.displayedItemName.isEmpty() ? this.shulkerBoxName : Component.translatable("decorated.shulkerbox.name", this.displayedItemName).getString());
-			this.name.setEditable(true);
-			this.setFocused(this.name);
+        if ((i == 0 || i == 1) && !this.shulkerBoxName.isEmpty() && this.menu.getSlot(this.menu.getResultSlot()).hasItem()) {
+            String name = this.displayedItemName.isEmpty() ? this.shulkerBoxName : Component.translatable("decorated.shulkerbox.name", this.displayedItemName).getString();
+            this.name.setValue(name);
+            this.name.setEditable(true);
+            this.setFocused(this.name);
             ci.cancel();
         }
     }
