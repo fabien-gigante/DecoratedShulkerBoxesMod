@@ -8,8 +8,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.fabien_gigante.DecoratedBoxComponent;
-import com.fabien_gigante.IDecoratedBox;
-import com.fabien_gigante.IDyed;
+import com.fabien_gigante.Decorable;
+import com.fabien_gigante.Dyeable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.component.DataComponentGetter;
@@ -30,7 +30,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 @Mixin(ShulkerBoxBlockEntity.class)
-public abstract class ShulkerBoxBlockEntityMixin extends BaseContainerBlockEntity implements IDecoratedBox {
+public abstract class ShulkerBoxBlockEntityMixin extends BaseContainerBlockEntity implements Decorable {
 	@Unique
 	private DecoratedBoxComponent decorations = DecoratedBoxComponent.DEFAULT;
 
@@ -85,6 +85,6 @@ public abstract class ShulkerBoxBlockEntityMixin extends BaseContainerBlockEntit
 
 	@Inject(method = "createMenu", at = @At("RETURN"))
 	protected void setMenuColor(int syncId, Inventory playerInventory, CallbackInfoReturnable<AbstractContainerMenu> cir) {
-		if (cir.getReturnValue() instanceof IDyed dyed) dyed.setColor(getColor());
+		if (cir.getReturnValue() instanceof Dyeable dyed) dyed.setColor(getColor());
 	}
 }

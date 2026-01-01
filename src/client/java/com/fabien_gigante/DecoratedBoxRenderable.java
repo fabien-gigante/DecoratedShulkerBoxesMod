@@ -6,6 +6,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 
-public interface IDecoratedBoxRenderer {
+public interface DecoratedBoxRenderable {
 	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, int tintedColor, Material lidId, Material baseId, ItemStack display);
 }

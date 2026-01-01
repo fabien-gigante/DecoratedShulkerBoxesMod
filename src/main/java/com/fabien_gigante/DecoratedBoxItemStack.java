@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.phys.Vec3;
 
 // ItemStack wrapper for decorated shulker box item stack
-public class DecoratedBoxItemStack implements IDecoratedBox {
+public class DecoratedBoxItemStack implements Decorable {
 	private final ItemStack stack;
 	public DecoratedBoxItemStack(ItemStack stack) { this.stack = stack; }
 

@@ -4,13 +4,10 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 
 // Interface to decoration information 
-public interface IDecoratedBox {
+public interface Decorable extends Dyeable {
 	// Component accessors
 	public DecoratedBoxComponent getDecorations();
 	public void setDecorations(DecoratedBoxComponent decorations);
-
-	// Primary color accessor, if any
-	public DyeColor getColor();
 
 	// Secondary color accessors
 	public default boolean hasSecondaryColor() { return getSecondaryColor() != null; }

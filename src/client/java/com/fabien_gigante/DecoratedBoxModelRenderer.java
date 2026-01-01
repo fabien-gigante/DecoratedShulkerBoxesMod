@@ -32,7 +32,7 @@ public class DecoratedBoxModelRenderer implements SpecialModelRenderer<Decorated
 
    @Override
    public DecoratedBoxComponent extractArgument(ItemStack stack) {
-        IDecoratedBox decorated = new DecoratedBoxItemStack(stack);
+        Decorable decorated = new DecoratedBoxItemStack(stack);
         return decorated.getDecorations();
    }
 
@@ -41,7 +41,7 @@ public class DecoratedBoxModelRenderer implements SpecialModelRenderer<Decorated
         DyeColor secondaryColor = decorations.secondaryColor();
         Material secondaryId = secondaryColor == null ? textureId : Sheets.SHULKER_TEXTURE_LOCATION.get(secondaryColor.getId());
         ItemStack displayedItem = decorations.displayedItem();
-        IDecoratedBoxRenderer renderer = (IDecoratedBoxRenderer)this.blockEntityRenderer;
+        DecoratedBoxRenderable renderer = (DecoratedBoxRenderable)this.blockEntityRenderer;
         renderer.submit(matrices, queue, light, overlay, this.facing, this.openness, tintedColor, this.textureId, secondaryId, displayedItem);
     }
 }

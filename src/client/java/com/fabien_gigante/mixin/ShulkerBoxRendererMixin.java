@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import com.fabien_gigante.DecoratedBoxModel;
-import com.fabien_gigante.IDecoratedBox;
-import com.fabien_gigante.IDecoratedBoxRenderer;
+import com.fabien_gigante.Decorable;
+import com.fabien_gigante.DecoratedBoxRenderable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
@@ -38,7 +38,7 @@ import net.minecraft.world.phys.Vec3;
 import com.fabien_gigante.DecoratedBoxRenderState;
 
 @Mixin(ShulkerBoxRenderer.class)
-public abstract class ShulkerBoxRendererMixin implements IDecoratedBoxRenderer {
+public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable {
 	@Shadow @Final private ShulkerBoxModel model;
 	@Shadow @Final private MaterialSet materials;
     @Final private ItemModelResolver itemModelManager;
@@ -70,8 +70,8 @@ public abstract class ShulkerBoxRendererMixin implements IDecoratedBoxRenderer {
 	@Inject(method="extractRenderState", at=@At("TAIL"))
 	public void extractDecoratedState(ShulkerBoxBlockEntity shulker, ShulkerBoxRenderState shulkerState, float f, Vec3 vec3d, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlayCommand, CallbackInfo ci) {
 		DecoratedBoxRenderState state = (DecoratedBoxRenderState)shulkerState;
-		state.secondaryColor = shulker instanceof IDecoratedBox decorated ? decorated.getSecondaryColor() : null;
-		ItemStack stack = shulker instanceof IDecoratedBox decorated ? decorated.getDisplayedItem() : null;
+		state.secondaryColor = shulker instanceof Decorable decorated ? decorated.getSecondaryColor() : null;
+		ItemStack stack = shulker instanceof Decorable decorated ? decorated.getDisplayedItem() : null;
        	this.itemModelManager.updateForTopItem(state.itemRenderState, stack == null ? ItemStack.EMPTY : stack, ItemDisplayContext.FIXED, shulker.getLevel(), null, 0);
 	}
 
@@ -106,7 +106,7 @@ public abstract class ShulkerBoxRendererMixin implements IDecoratedBoxRenderer {
 		this.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, state.direction, state.progress, state.breakProgress, 0, lidId, baseId, state.itemRenderState, false);
 	}
 
-	// IDecoratedShulkerBoxRenderer
+	@Override // implements DecoratedBoxRenderable
 	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, int tintedColor, Material lidId, Material baseId, ItemStack displayed) {
 		ItemStackRenderState itemRenderState = new ItemStackRenderState();
        	this.itemModelManager.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);

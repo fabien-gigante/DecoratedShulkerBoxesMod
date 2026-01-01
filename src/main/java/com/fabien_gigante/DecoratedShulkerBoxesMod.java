@@ -45,7 +45,7 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 		for(DyeColor color : DyeColor.values()) {
 			var type = new MenuType<>( (syncId, playerInventory) -> {
 				var handler = new ShulkerBoxMenu(syncId, playerInventory);
-				if (handler instanceof IDyed dyed) dyed.setColor(color);
+				if (handler instanceof Dyeable dyed) dyed.setColor(color);
 				return handler;
 			}, FeatureFlags.VANILLA_SET);
 			SCREEN_HANDLER_TYPES.put(color, type);

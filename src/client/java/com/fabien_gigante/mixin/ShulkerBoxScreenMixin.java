@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.fabien_gigante.DecoratedShulkerBoxesModClient;
-import com.fabien_gigante.IDyed;
+import com.fabien_gigante.Dyeable;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
@@ -26,7 +26,7 @@ public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<Shul
     public ShulkerBoxScreenMixin(ShulkerBoxMenu handler, Inventory inventory, Component title) { super(handler, inventory, title); }
 
     private int getColor() {
-        if (!(this.menu instanceof IDyed dyed)) return 0;
+        if (!(this.menu instanceof Dyeable dyed)) return 0;
         DyeColor dye = dyed.getColor();
         return ARGB.opaque(dye == null ? DEFAULT_COLOR : dye.getTextureDiffuseColor()); 
     }
