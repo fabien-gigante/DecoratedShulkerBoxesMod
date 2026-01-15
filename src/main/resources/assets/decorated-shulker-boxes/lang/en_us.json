@@ -1,3 +1,4 @@
 {
-    "decorated.shulkerbox.name": "Box of %s"
+    "decorated.shulkerbox.name": "Box of %s",
+    "event.minecraft.raid.wave": "Wave %d/%d incoming"
 }
