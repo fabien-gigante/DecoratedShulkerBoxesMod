@@ -9,8 +9,7 @@
 		"CauldronInteractionMixin",
 		"AnvilMenuMixin",
 		"GrindstoneMenuMixin",
-		"GrindstoneSlotMixin",
-		"RaidMixin"
+		"GrindstoneSlotMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
