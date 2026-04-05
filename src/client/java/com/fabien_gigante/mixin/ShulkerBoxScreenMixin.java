@@ -53,10 +53,3 @@ public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<Shul
         }
     }
 }
-
-/*
- Mixin apply for mod decorated-shulker-boxes failed DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes -> 
- net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen: org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException Invalid descriptor on 
- DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes->@Inject::extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V! Expected (Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIFLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V [INJECT_APPLY Applicator Phase -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes -> Apply Injections ->  -> Inject -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes->@Inject::extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V]
-
-*/

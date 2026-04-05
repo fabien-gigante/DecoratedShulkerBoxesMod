@@ -36,8 +36,8 @@ public abstract class ShulkerBoxBlockEntityMixin extends BaseContainerBlockEntit
 
 	private ShulkerBoxBlockEntityMixin(BlockEntityType<?> blockEntityType, BlockPos blockPos, BlockState blockState) { super(blockEntityType, blockPos, blockState); }
 
-	// Shulker boxed can be decorated
-	
+	// Shulker boxes can be decorated
+
 	@Shadow
 	public abstract DyeColor getColor();
 	public void setDecorations(DecoratedBoxComponent decorations) { this.decorations = decorations; }

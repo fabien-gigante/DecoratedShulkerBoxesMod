@@ -29,8 +29,8 @@ public abstract class AnvilMenuMixin extends ItemCombinerMenu {
 	@Shadow @Final private DataSlot cost;
 	@Shadow @Nullable private String itemName;
 
-	protected AnvilMenuMixin(@Nullable MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess context, ItemCombinerMenuSlotDefinition forgingSlotsManager) {
-		super(type, syncId, playerInventory, context, forgingSlotsManager);
+	protected AnvilMenuMixin(@Nullable MenuType<?> type, int syncId, Inventory playerInventory, ContainerLevelAccess access, ItemCombinerMenuSlotDefinition itemInputSlots) {
+		super(type, syncId, playerInventory, access, itemInputSlots);
 	}
    
 	// Produce a decorated shulker box when possible

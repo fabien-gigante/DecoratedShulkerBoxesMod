@@ -41,16 +41,16 @@ import com.fabien_gigante.DecoratedBoxRenderState;
 public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable {
 	@Shadow @Final private ShulkerBoxModel model;
 	@Shadow @Final private SpriteGetter sprites;
-    @Final private ItemModelResolver itemModelManager;
+    @Final private ItemModelResolver itemModelResolver;
 
 	@Inject(method="<init>(Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider$Context;)V", at=@At("TAIL"))
 	private void onInit1(BlockEntityRendererProvider.Context context, CallbackInfo ci) {
-		this.itemModelManager = context.itemModelResolver();
+		this.itemModelResolver = context.itemModelResolver();
 	}
 
 	@Inject(method="<init>(Lnet/minecraft/client/renderer/special/SpecialModelRenderer$BakingContext;)V", at=@At("TAIL"))
 	private void onInit2(SpecialModelRenderer.BakingContext context, CallbackInfo ci) {
-		this.itemModelManager = Minecraft.getInstance().getItemModelResolver();
+		this.itemModelResolver = Minecraft.getInstance().getItemModelResolver();
 	}
 
 	@Redirect(method = "<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;)V",
@@ -61,14 +61,16 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 
 	/** @reason intended @author fabien **/
 	@Overwrite
-	public ShulkerBoxRenderState createRenderState() { return new DecoratedBoxRenderState();}
+	public ShulkerBoxRenderState createRenderState() { 
+		return new DecoratedBoxRenderState();
+	}
 
 	@Inject(method="extractRenderState", at=@At("TAIL"))
 	public void extractDecoratedState(ShulkerBoxBlockEntity shulker, ShulkerBoxRenderState shulkerState, float f, Vec3 vec3d, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlayCommand, CallbackInfo ci) {
 		DecoratedBoxRenderState state = (DecoratedBoxRenderState)shulkerState;
 		state.secondaryColor = shulker instanceof Decorable decorated ? decorated.getSecondaryColor() : null;
 		ItemStack stack = shulker instanceof Decorable decorated ? decorated.getDisplayedItem() : null;
-       	this.itemModelManager.updateForTopItem(state.itemRenderState, stack == null ? ItemStack.EMPTY : stack, ItemDisplayContext.FIXED, shulker.getLevel(), null, 0);
+       	this.itemModelResolver.updateForTopItem(state.itemRenderState, stack == null ? ItemStack.EMPTY : stack, ItemDisplayContext.FIXED, shulker.getLevel(), null, 0);
 	}
 
 	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, SpriteId lidId, SpriteId baseId) {
@@ -106,15 +108,7 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 	@Override // implements DecoratedBoxRenderable
 	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int tintedColor, SpriteId lidId, SpriteId baseId, ItemStack displayed) {
 		ItemStackRenderState itemRenderState = new ItemStackRenderState();
-       	this.itemModelManager.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);
+       	this.itemModelResolver.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);
 		this.submit(matrices, queue, light, overlay, null, openness, null, tintedColor, lidId, baseId, itemRenderState, true);
 	}
 }
-
-/*
-
-Mixin apply for mod decorated-shulker-boxes failed DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxRendererMixin from mod decorated-shulker-boxes 
--> net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer: org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException Critical injection failure:
- @Redirect annotation on createModel could not find any targets matching '<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;)V' in net/minecraft/client/renderer/blockentity/ShulkerBoxRenderer. No refMap loaded. [INJECT_PREPARE Applicator Phase -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxRendererMixin from mod decorated-shulker-boxes -> Prepare Injections -> redirect$baj000$decorated-shulker-boxes$createModel(Lnet/minecraft/client/model/geom/ModelPart;)Lnet/minecraft/client/renderer/blockentity/ShulkerBoxRenderer$ShulkerBoxModel; -> Parse ->  -> Validate Targets]
-
-*/
