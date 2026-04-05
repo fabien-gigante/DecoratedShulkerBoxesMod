@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import com.fabien_gigante.DecoratedShulkerBoxesModClient;
 import com.fabien_gigante.Dyeable;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -34,22 +34,29 @@ public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<Shul
         return ARGB.blue(ARGB.greyscale(color)) < 160;
     }
 
-    @Inject(method="renderBg", at=@At("TAIL"))
-    protected void drawBackground(GuiGraphics context, float deltaTicks, int mouseX, int mouseY, CallbackInfo ci) {
+    @Inject(method="extractBackground", at=@At("TAIL"))
+    protected void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float a, CallbackInfo ci) {
         int color = getColor();
         if (color != 0)
             context.blit(RenderPipelines.GUI_TEXTURED, DYED_TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight, 256, 256, color);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {
         int color = getColor();
         if (color == 0)
-            super.renderLabels(context, mouseX, mouseY);
+            super.extractLabels(context, mouseX, mouseY);
         else {
             int titleColor = isDarkColor(color) ? 0xffffffff : 0xff404040;
-            context.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY + 1, titleColor, false);
-            context.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY + 1, 0xff404040, false);
+            context.text(this.font, this.title, this.titleLabelX, this.titleLabelY + 1, titleColor, false);
+            context.text(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY + 1, 0xff404040, false);
         }
     }
 }
+
+/*
+ Mixin apply for mod decorated-shulker-boxes failed DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes -> 
+ net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen: org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException Invalid descriptor on 
+ DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes->@Inject::extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V! Expected (Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIFLorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V but found (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V [INJECT_APPLY Applicator Phase -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes -> Apply Injections ->  -> Inject -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxScreenMixin from mod decorated-shulker-boxes->@Inject::extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;FIILorg/spongepowered/asm/mixin/injection/callback/CallbackInfo;)V]
+
+*/

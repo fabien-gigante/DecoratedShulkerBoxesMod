@@ -26,10 +26,10 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.MaterialSet;
+import net.minecraft.client.resources.model.sprite.SpriteId;
+import net.minecraft.client.resources.model.sprite.SpriteGetter;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -40,10 +40,8 @@ import com.fabien_gigante.DecoratedBoxRenderState;
 @Mixin(ShulkerBoxRenderer.class)
 public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable {
 	@Shadow @Final private ShulkerBoxModel model;
-	@Shadow @Final private MaterialSet materials;
+	@Shadow @Final private SpriteGetter sprites;
     @Final private ItemModelResolver itemModelManager;
-
-	@Shadow private void prepareModel(PoseStack matrices, Direction facing, float openness) {}
 
 	@Inject(method="<init>(Lnet/minecraft/client/renderer/blockentity/BlockEntityRendererProvider$Context;)V", at=@At("TAIL"))
 	private void onInit1(BlockEntityRendererProvider.Context context, CallbackInfo ci) {
@@ -55,7 +53,7 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 		this.itemModelManager = Minecraft.getInstance().getItemModelResolver();
 	}
 
-	@Redirect(method = "<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;)V",
+	@Redirect(method = "<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/sprite/SpriteGetter;)V",
 			  at = @At(value = "NEW", target = "net/minecraft/client/renderer/blockentity/ShulkerBoxRenderer$ShulkerBoxModel") )
 	private ShulkerBoxModel createModel(ModelPart part) {
 		return new DecoratedBoxModel(part);
@@ -63,9 +61,7 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 
 	/** @reason intended @author fabien **/
 	@Overwrite
-	public ShulkerBoxRenderState createRenderState() {
-		return new DecoratedBoxRenderState();
-	}
+	public ShulkerBoxRenderState createRenderState() { return new DecoratedBoxRenderState();}
 
 	@Inject(method="extractRenderState", at=@At("TAIL"))
 	public void extractDecoratedState(ShulkerBoxBlockEntity shulker, ShulkerBoxRenderState shulkerState, float f, Vec3 vec3d, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlayCommand, CallbackInfo ci) {
@@ -75,9 +71,9 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
        	this.itemModelManager.updateForTopItem(state.itemRenderState, stack == null ? ItemStack.EMPTY : stack, ItemDisplayContext.FIXED, shulker.getLevel(), null, 0);
 	}
 
-	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, Material lidId, Material baseId) {
-		queue.submitModel(this.model, openness, matrices, lidId.renderType(model::renderType), light, overlay, -1, this.materials.get(lidId), tintedColor, crumblingOverlay);
-		queue.submitModel(this.model, Float.NaN, matrices, baseId.renderType(model::renderType), light, overlay, -1, this.materials.get(baseId), tintedColor, crumblingOverlay);
+	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, SpriteId lidId, SpriteId baseId) {
+		queue.submitModel(this.model, openness, matrices, lidId.renderType(model::renderType), light, overlay, -1, this.sprites.get(lidId), tintedColor, crumblingOverlay);
+		queue.submitModel(this.model, Float.NaN, matrices, baseId.renderType(model::renderType), light, overlay, -1, this.sprites.get(baseId), tintedColor, crumblingOverlay);
 	}
 
 	private void submitDisplayed(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, ItemStackRenderState itemRenderState, boolean zoomed) {
@@ -89,9 +85,10 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 		itemRenderState.submit(matrices, queue, light, overlay, tintedColor);
 	}
 
-	private void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int i, Material lidId, Material baseId, ItemStackRenderState itemRenderState, boolean zoomed) {
+	private void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int i, SpriteId lidId, SpriteId baseId, ItemStackRenderState itemRenderState, boolean zoomed) {
 		matrices.pushPose();
-		this.prepareModel(matrices, facing, openness);
+     	if (facing != null) matrices.mulPose(ShulkerBoxRenderer.modelTransform(facing));
+		this.model.setupAnim(openness);
 		this.submitModel(matrices, queue, light, overlay, openness, crumblingOverlay, i, lidId, baseId);
 		this.submitDisplayed(matrices, queue, light, overlay, openness, crumblingOverlay, i, itemRenderState, zoomed);
 		matrices.popPose();
@@ -101,15 +98,23 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 	@Overwrite
 	public void submit(ShulkerBoxRenderState shulkerState, PoseStack matrices, SubmitNodeCollector queue, CameraRenderState cameraRenderState) {
 		DecoratedBoxRenderState state = (DecoratedBoxRenderState)shulkerState;
-		Material lidId = state.color == null ? Sheets.DEFAULT_SHULKER_TEXTURE_LOCATION : Sheets.getShulkerBoxMaterial(state.color);
-		Material baseId = state.secondaryColor == null ? lidId : Sheets.SHULKER_TEXTURE_LOCATION.get(state.secondaryColor.getId());
+		SpriteId lidId = state.color == null ? Sheets.DEFAULT_SHULKER_TEXTURE_LOCATION : Sheets.getShulkerBoxSprite(state.color);
+		SpriteId baseId = state.secondaryColor == null ? lidId : Sheets.SHULKER_TEXTURE_LOCATION.get(state.secondaryColor.getId());
 		this.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, state.direction, state.progress, state.breakProgress, 0, lidId, baseId, state.itemRenderState, false);
 	}
 
 	@Override // implements DecoratedBoxRenderable
-	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, int tintedColor, Material lidId, Material baseId, ItemStack displayed) {
+	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int tintedColor, SpriteId lidId, SpriteId baseId, ItemStack displayed) {
 		ItemStackRenderState itemRenderState = new ItemStackRenderState();
        	this.itemModelManager.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);
-		this.submit(matrices, queue, light, overlay, facing, openness, null, tintedColor, lidId, baseId, itemRenderState, true);
+		this.submit(matrices, queue, light, overlay, null, openness, null, tintedColor, lidId, baseId, itemRenderState, true);
 	}
 }
+
+/*
+
+Mixin apply for mod decorated-shulker-boxes failed DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxRendererMixin from mod decorated-shulker-boxes 
+-> net.minecraft.client.renderer.blockentity.ShulkerBoxRenderer: org.spongepowered.asm.mixin.injection.throwables.InvalidInjectionException Critical injection failure:
+ @Redirect annotation on createModel could not find any targets matching '<init>(Lnet/minecraft/client/model/geom/EntityModelSet;Lnet/minecraft/client/resources/model/MaterialSet;)V' in net/minecraft/client/renderer/blockentity/ShulkerBoxRenderer. No refMap loaded. [INJECT_PREPARE Applicator Phase -> DecoratedShulkerBoxesMod.client.mixins.json:ShulkerBoxRendererMixin from mod decorated-shulker-boxes -> Prepare Injections -> redirect$baj000$decorated-shulker-boxes$createModel(Lnet/minecraft/client/model/geom/ModelPart;)Lnet/minecraft/client/renderer/blockentity/ShulkerBoxRenderer$ShulkerBoxModel; -> Parse ->  -> Validate Targets]
+
+*/

@@ -1,7 +1,6 @@
 package com.fabien_gigante;
 
 import java.util.Set;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -21,6 +20,7 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
@@ -32,6 +32,8 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	
     public static final DataComponentType<DecoratedBoxComponent> DECORATED_BOX_TYPE = DecoratedBoxComponent.TYPE;
 	public static final Map<DyeColor,MenuType<ShulkerBoxMenu>> SCREEN_HANDLER_TYPES = new HashMap<>();
+	
+	public static final ShulkerBoxBlock[] COLORED_SHULKER_BOXES = { (ShulkerBoxBlock)Blocks.WHITE_SHULKER_BOX, (ShulkerBoxBlock)Blocks.ORANGE_SHULKER_BOX, (ShulkerBoxBlock)Blocks.MAGENTA_SHULKER_BOX, (ShulkerBoxBlock)Blocks.LIGHT_BLUE_SHULKER_BOX, (ShulkerBoxBlock)Blocks.YELLOW_SHULKER_BOX, (ShulkerBoxBlock)Blocks.LIME_SHULKER_BOX, (ShulkerBoxBlock)Blocks.PINK_SHULKER_BOX, (ShulkerBoxBlock)Blocks.GRAY_SHULKER_BOX, (ShulkerBoxBlock)Blocks.LIGHT_GRAY_SHULKER_BOX, (ShulkerBoxBlock)Blocks.CYAN_SHULKER_BOX, (ShulkerBoxBlock)Blocks.PURPLE_SHULKER_BOX, (ShulkerBoxBlock)Blocks.BLUE_SHULKER_BOX, (ShulkerBoxBlock)Blocks.BROWN_SHULKER_BOX, (ShulkerBoxBlock)Blocks.GREEN_SHULKER_BOX, (ShulkerBoxBlock)Blocks.RED_SHULKER_BOX, (ShulkerBoxBlock)Blocks.BLACK_SHULKER_BOX };
 
 	// Server-side mod entry point
 	@Override
@@ -42,22 +44,20 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	}
 
 	private void registerScreens() {
-		for(DyeColor color : DyeColor.values()) {
+		for(ShulkerBoxBlock shulker : COLORED_SHULKER_BOXES) {
 			var type = new MenuType<>( (syncId, playerInventory) -> {
 				var handler = new ShulkerBoxMenu(syncId, playerInventory);
-				if (handler instanceof Dyeable dyed) dyed.setColor(color);
+				if (handler instanceof Dyeable dyed) dyed.setColor(shulker.getColor());
 				return handler;
 			}, FeatureFlags.VANILLA_SET);
-			SCREEN_HANDLER_TYPES.put(color, type);
-			Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, ShulkerBoxBlock.getBlockByColor(color).getDescriptionId()), type);
+			SCREEN_HANDLER_TYPES.put(shulker.getColor(), type);
+			Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, shulker.getDescriptionId()), type);
 		}
 	}
 
 	private void updateLootTables() {
 		Set<ResourceKey<LootTable>> SHULKER_BOX_LOOT_TABLES = 
-			Stream.concat(Stream.of((DyeColor)null), Arrays.stream(DyeColor.values()))
-			.map(color -> ShulkerBoxBlock.getBlockByColor(color).getLootTable().orElseThrow())
-			.collect(Collectors.toSet());
+			Stream.of(COLORED_SHULKER_BOXES).map(shulker -> shulker.getLootTable().orElseThrow()).collect(Collectors.toSet());
 		LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
 			if (source.isBuiltin() && SHULKER_BOX_LOOT_TABLES.contains(key))
 				builder.apply(

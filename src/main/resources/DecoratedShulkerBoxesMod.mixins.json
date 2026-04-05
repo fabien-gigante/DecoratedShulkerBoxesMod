@@ -1,12 +1,12 @@
 {
 	"required": true,
 	"package": "com.fabien_gigante.mixin",
-	"compatibilityLevel": "JAVA_21",
+	"compatibilityLevel": "JAVA_25",
 	"mixins": [
 		"ShulkerBoxBlockEntityMixin",
 		"ShulkerBoxMenuMixin",
 		"TransmuteRecipeMixin",
-		"CauldronInteractionMixin",
+		"CauldronInteractionsMixin",
 		"AnvilMenuMixin",
 		"GrindstoneMenuMixin",
 		"GrindstoneSlotMixin"
