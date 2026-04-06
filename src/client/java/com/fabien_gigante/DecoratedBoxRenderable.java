@@ -5,6 +5,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.resources.model.sprite.SpriteId;
 import net.minecraft.world.item.ItemStack;
 
+// Used to allow ShulkerBoxRenderer to render the decorations and displayed item by calling DecoratedBoxModelRenderer
 public interface DecoratedBoxRenderable {
 	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int tintedColor, SpriteId lidId, SpriteId baseId, ItemStack display);
 }

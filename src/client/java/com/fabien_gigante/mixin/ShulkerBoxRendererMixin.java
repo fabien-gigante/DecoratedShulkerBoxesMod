@@ -105,7 +105,7 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 		this.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, state.direction, state.progress, state.breakProgress, 0, lidId, baseId, state.itemRenderState, false);
 	}
 
-	@Override // implements DecoratedBoxRenderable
+	@Override // implements DecoratedBoxRenderable, called from DecoratedBoxModelRenderer
 	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int tintedColor, SpriteId lidId, SpriteId baseId, ItemStack displayed) {
 		ItemStackRenderState itemRenderState = new ItemStackRenderState();
        	this.itemModelResolver.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);
