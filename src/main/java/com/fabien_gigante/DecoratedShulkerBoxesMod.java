@@ -40,7 +40,12 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	public void onInitialize() {
 		LOGGER.info("Decorated Shulker Boxes - Mod starting...");
 		registerScreens();
+		registerRecipes() ;
 		updateLootTables();
+	}
+
+	private void registerRecipes() {
+		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(MOD_ID, "decorated_box_recipe"), DecoratedBoxRecipe.SERIALIZER);
 	}
 
 	private void registerScreens() {

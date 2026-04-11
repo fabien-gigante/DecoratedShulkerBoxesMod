@@ -5,7 +5,6 @@
 	"mixins": [
 		"ShulkerBoxBlockEntityMixin",
 		"ShulkerBoxMenuMixin",
-		"TransmuteRecipeMixin",
 		"CauldronInteractionsMixin",
 		"AnvilMenuMixin",
 		"GrindstoneMenuMixin",
