@@ -42,7 +42,7 @@ public class DecoratedBoxItemStack implements Decorable {
 	// Drops the displayed item (if any) to the ground towards the player
 	public void dropDisplayedItem(Level world, BlockPos from, Player player) {
 		if (!hasDisplayedItem()) return;
-		Vec3 vec = from.getCenter(), dir = player.getEyePosition().subtract(vec).normalize();
+		Vec3 vec = Vec3.atCenterOf(from), dir = player.getEyePosition().subtract(vec).normalize();
 		vec = vec.add(dir.scale(.75)); dir = dir.scale(.05).add(0,.1,0);
 		var entity = new ItemEntity(world, vec.x, vec.y, vec.z, getDisplayedItem(), dir.x, dir.y, dir.z);
 		entity.setDefaultPickUpDelay();

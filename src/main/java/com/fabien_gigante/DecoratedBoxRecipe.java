@@ -22,7 +22,6 @@ import net.minecraft.world.level.Level;
 public class DecoratedBoxRecipe extends CustomRecipe {
     public static final DecoratedBoxRecipe INSTANCE = new DecoratedBoxRecipe();
     public static final RecipeSerializer<DecoratedBoxRecipe> SERIALIZER = new RecipeSerializer<>(MapCodec.unit(INSTANCE), StreamCodec.unit(INSTANCE));
-    private static final Item[] SHULKER_BY_COLOR = { Items.WHITE_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, Items.MAGENTA_SHULKER_BOX, Items.LIGHT_BLUE_SHULKER_BOX, Items.YELLOW_SHULKER_BOX, Items.LIME_SHULKER_BOX, Items.PINK_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.PURPLE_SHULKER_BOX, Items.BLUE_SHULKER_BOX, Items.BROWN_SHULKER_BOX, Items.GREEN_SHULKER_BOX, Items.RED_SHULKER_BOX, Items.BLACK_SHULKER_BOX };
 
     public DecoratedBoxRecipe() {}
 
@@ -50,7 +49,7 @@ public class DecoratedBoxRecipe extends CustomRecipe {
 	public ItemStack assemble(CraftingInput input) {
         ItemStack shulker = single(input, ItemTags.SHULKER_BOXES);
         List<DyeColor> dyes = find(input, ItemTags.DYES).map(stack -> stack.get(DataComponents.DYE)).toList();
-		ItemStack decorated = new ItemStack(SHULKER_BY_COLOR[dyes.get(0).getId()]);
+		ItemStack decorated = new ItemStack(Items.DYED_SHULKER_BOX.pick(dyes.get(0)));
         decorated.applyComponents(shulker.getComponentsPatch());
 		new DecoratedBoxItemStack(decorated).setSecondaryColor(dyes.get(1));
 		return decorated;
