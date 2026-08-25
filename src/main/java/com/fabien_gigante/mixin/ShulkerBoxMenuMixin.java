@@ -23,7 +23,7 @@ public abstract class ShulkerBoxMenuMixin extends AbstractContainerMenu implemen
 
     @Override 
     public MenuType<?> getType() {
-        MenuType<?> type = (color != null) ? DecoratedShulkerBoxesMod.SCREEN_HANDLER_TYPES.get(color) : null;
+        MenuType<?> type = DecoratedShulkerBoxesMod.MENU_TYPES.get(color);
         return (type != null) ? type : super.getType();
     }
 }

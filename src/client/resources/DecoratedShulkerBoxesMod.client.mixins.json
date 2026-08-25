@@ -3,6 +3,7 @@
 	"package": "com.fabien_gigante.mixin",
 	"compatibilityLevel": "JAVA_25",
 	"client": [
+		"ShulkerBoxBlockMixin",
 		"ShulkerBoxRendererMixin",
 		"ShulkerBoxSpecialRendererUnbakedMixin",
 		"ShulkerBoxScreenMixin",

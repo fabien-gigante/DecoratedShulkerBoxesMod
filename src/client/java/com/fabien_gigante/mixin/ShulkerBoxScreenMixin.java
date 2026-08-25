@@ -15,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
 import net.minecraft.world.item.DyeColor;
 
@@ -26,8 +27,10 @@ public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<Shul
     public ShulkerBoxScreenMixin(ShulkerBoxMenu handler, Inventory inventory, Component title) { super(handler, inventory, title); }
 
     private int getColor() {
-        if (!(this.menu instanceof Dyeable dyed)) return 0;
-        DyeColor dye = dyed.getColor();
+        DyeColor dye = null;
+        if (this.menu.getType() == MenuType.SHULKER_BOX) // Mod not present on server
+            dye = DecoratedShulkerBoxesModClient.lastUsedShulkerBoxColor;
+        else if (this.menu instanceof Dyeable dyed) dye = dyed.getColor();
         return ARGB.opaque(dye == null ? DEFAULT_COLOR : dye.getTextureDiffuseColor()); 
     }
     private static boolean isDarkColor(int color) {

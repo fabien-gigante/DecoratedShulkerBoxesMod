@@ -30,13 +30,13 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 	
     public static final DataComponentType<DecoratedBoxComponent> DECORATED_BOX_TYPE = DecoratedBoxComponent.TYPE;
-	public static final Map<DyeColor,MenuType<ShulkerBoxMenu>> SCREEN_HANDLER_TYPES = new HashMap<>();
+	public static final Map<DyeColor,MenuType<ShulkerBoxMenu>> MENU_TYPES = new HashMap<>();
 	
 	// Server-side mod entry point
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Decorated Shulker Boxes - Mod starting...");
-		registerScreens();
+		registerMenus();
 		registerRecipes() ;
 		updateLootTables();
 	}
@@ -45,17 +45,19 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, Identifier.fromNamespaceAndPath(MOD_ID, "decorated_box_recipe"), DecoratedBoxRecipe.SERIALIZER);
 	}
 
-	private void registerScreens() {
-		Blocks.DYED_SHULKER_BOX.forEach(block -> {
-			ShulkerBoxBlock shulker = (ShulkerBoxBlock)block;
-			var type = new MenuType<>( (syncId, playerInventory) -> {
-				var handler = new ShulkerBoxMenu(syncId, playerInventory);
-				if (handler instanceof Dyeable dyed) dyed.setColor(shulker.getColor());
-				return handler;
-			}, FeatureFlags.VANILLA_SET);
-			SCREEN_HANDLER_TYPES.put(shulker.getColor(), type);
-			Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, block.getDescriptionId()), type);
-		});
+	private void registerMenu(ShulkerBoxBlock shulker) {
+		var type = new MenuType<>( (syncId, playerInventory) -> {
+			var menu = new ShulkerBoxMenu(syncId, playerInventory);
+			if (menu instanceof Dyeable dyed) dyed.setColor(shulker.getColor());
+			return menu;
+		}, FeatureFlags.VANILLA_SET);
+		MENU_TYPES.put(shulker.getColor(), type);
+		Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, shulker.getDescriptionId()), type);
+	}
+
+	private void registerMenus() {
+		registerMenu((ShulkerBoxBlock)Blocks.SHULKER_BOX);
+		Blocks.DYED_SHULKER_BOX.forEach(block -> registerMenu((ShulkerBoxBlock)block));
 	}
 
 	private void updateLootTables() {
@@ -64,8 +66,7 @@ public class DecoratedShulkerBoxesMod implements ModInitializer {
 		LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
 			if (source.isBuiltin() && lootTables.contains(key))
 				builder.apply(
-					CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
-					.include(DECORATED_BOX_TYPE)
+					CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY).include(DECORATED_BOX_TYPE)
 				);
 		});
 	}
