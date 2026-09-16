@@ -77,11 +77,8 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, int outlineColor, SpriteId lidId, SpriteId baseId) {
 		queue.submitModel(this.model, openness, matrices, light, overlay, tintedColor, lidId, this.sprites, outlineColor);
 		queue.submitModel(this.model, Float.NaN, matrices, light, overlay, tintedColor, baseId, this.sprites, outlineColor);
-		if (crumblingOverlay != null) {
-			RenderType lidRenderType = lidId.renderType(model::renderType), baseRenderType = baseId.renderType(model::renderType);
-			queue.order(1).submitCrumblingOverlay(this.model, openness, matrices, lidRenderType, light, overlay, tintedColor, crumblingOverlay);
-			queue.order(1).submitCrumblingOverlay(this.model, Float.NaN, matrices, baseRenderType, light, overlay, tintedColor, crumblingOverlay);
-		}		
+		if (crumblingOverlay != null)
+			queue.order(1).submitCrumblingOverlay(this.model, openness, matrices, lidId.renderType(model::renderType), light, overlay, tintedColor, crumblingOverlay);
 	}
 
 	private void submitDisplayed(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int outlineColor, ItemStackRenderState itemRenderState, boolean zoomed) {
