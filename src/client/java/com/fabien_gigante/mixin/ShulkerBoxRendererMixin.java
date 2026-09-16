@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.blockentity.state.ShulkerBoxRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -73,26 +74,31 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
        	this.itemModelResolver.updateForTopItem(state.itemRenderState, stack == null ? ItemStack.EMPTY : stack, ItemDisplayContext.FIXED, shulker.getLevel(), null, 0);
 	}
 
-	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, SpriteId lidId, SpriteId baseId) {
-		queue.submitModel(this.model, openness, matrices, lidId.renderType(model::renderType), light, overlay, -1, this.sprites.get(lidId), tintedColor, crumblingOverlay);
-		queue.submitModel(this.model, Float.NaN, matrices, baseId.renderType(model::renderType), light, overlay, -1, this.sprites.get(baseId), tintedColor, crumblingOverlay);
+	private void submitModel(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, int outlineColor, SpriteId lidId, SpriteId baseId) {
+		queue.submitModel(this.model, openness, matrices, light, overlay, tintedColor, lidId, this.sprites, outlineColor);
+		queue.submitModel(this.model, Float.NaN, matrices, light, overlay, tintedColor, baseId, this.sprites, outlineColor);
+		if (crumblingOverlay != null) {
+			RenderType lidRenderType = lidId.renderType(model::renderType), baseRenderType = baseId.renderType(model::renderType);
+			queue.order(1).submitCrumblingOverlay(this.model, openness, matrices, lidRenderType, light, overlay, tintedColor, crumblingOverlay);
+			queue.order(1).submitCrumblingOverlay(this.model, Float.NaN, matrices, baseRenderType, light, overlay, tintedColor, crumblingOverlay);
+		}		
 	}
 
-	private void submitDisplayed(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, ItemStackRenderState itemRenderState, boolean zoomed) {
+	private void submitDisplayed(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int outlineColor, ItemStackRenderState itemRenderState, boolean zoomed) {
 		matrices.translate(0, 7.75f / 16f - openness / 2f, 0);
-		matrices.mulPose(Axis.YP.rotationDegrees(180+270 * openness));
-		matrices.mulPose(Axis.XP.rotationDegrees(-90));
+		matrices.rotateDegrees(Axis.YP, 180 + 270 * openness);
+		matrices.rotateDegrees(Axis.XP, -90);
 		float scale = zoomed ? 0.75f : 2f/3f; // for comparaison, .5f is the scale used by item frame
 		matrices.scale(scale, scale, scale);
-		itemRenderState.submit(matrices, queue, light, overlay, tintedColor);
+		itemRenderState.submit(matrices, queue, light, overlay, outlineColor);
 	}
 
-	private void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int i, SpriteId lidId, SpriteId baseId, ItemStackRenderState itemRenderState, boolean zoomed) {
+	private void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, Direction facing, float openness, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int tintedColor, int outlineColor, SpriteId lidId, SpriteId baseId, ItemStackRenderState itemRenderState, boolean zoomed) {
 		matrices.pushPose();
      	if (facing != null) matrices.mulPose(ShulkerBoxRenderer.modelTransform(facing));
 		this.model.setupAnim(openness);
-		this.submitModel(matrices, queue, light, overlay, openness, crumblingOverlay, i, lidId, baseId);
-		this.submitDisplayed(matrices, queue, light, overlay, openness, crumblingOverlay, i, itemRenderState, zoomed);
+		this.submitModel(matrices, queue, light, overlay, openness, crumblingOverlay, tintedColor, outlineColor, lidId, baseId);	
+		this.submitDisplayed(matrices, queue, light, overlay, openness, crumblingOverlay, outlineColor, itemRenderState, zoomed);
 		matrices.popPose();
 	}
 
@@ -102,13 +108,13 @@ public abstract class ShulkerBoxRendererMixin implements DecoratedBoxRenderable 
 		DecoratedBoxRenderState state = (DecoratedBoxRenderState)shulkerState;
 		SpriteId lidId = state.color == null ? Sheets.DEFAULT_SHULKER_TEXTURE_LOCATION : Sheets.getShulkerBoxSprite(state.color);
 		SpriteId baseId = state.secondaryColor == null ? lidId : Sheets.SHULKER_TEXTURE_LOCATION.get(state.secondaryColor.getId());
-		this.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, state.direction, state.progress, state.breakProgress, 0, lidId, baseId, state.itemRenderState, false);
+		this.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, state.direction, state.progress, state.breakProgress, -1, 0, lidId, baseId, state.itemRenderState, false);
 	}
 
 	@Override // implements DecoratedBoxRenderable, called from DecoratedBoxModelRenderer
-	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int tintedColor, SpriteId lidId, SpriteId baseId, ItemStack displayed) {
+	public void submit(PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, float openness, int outlineColor, SpriteId lidId, SpriteId baseId, ItemStack displayed) {
 		ItemStackRenderState itemRenderState = new ItemStackRenderState();
        	this.itemModelResolver.updateForTopItem(itemRenderState, displayed == null ? ItemStack.EMPTY : displayed, ItemDisplayContext.FIXED, null, null, 0);
-		this.submit(matrices, queue, light, overlay, null, openness, null, tintedColor, lidId, baseId, itemRenderState, true);
+		this.submit(matrices, queue, light, overlay, null, openness, null, -1, outlineColor, lidId, baseId, itemRenderState, true);
 	}
 }

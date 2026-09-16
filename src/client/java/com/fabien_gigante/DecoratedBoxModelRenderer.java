@@ -33,11 +33,11 @@ public class DecoratedBoxModelRenderer implements SpecialModelRenderer<Decorated
    }
 
    @Override
-	public void submit(DecoratedBoxComponent decorations, PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, boolean glint, int tintedColor) {
+	public void submit(DecoratedBoxComponent decorations, PoseStack matrices, SubmitNodeCollector queue, int light, int overlay, boolean glint, int outlineColor) {
         DyeColor secondaryColor = decorations.secondaryColor();
         SpriteId secondaryId = secondaryColor == null ? textureId : Sheets.SHULKER_TEXTURE_LOCATION.get(secondaryColor.getId());
         ItemStack displayedItem = decorations.displayedItem();
         DecoratedBoxRenderable renderer = (DecoratedBoxRenderable)this.blockEntityRenderer;
-        renderer.submit(matrices, queue, light, overlay, this.openness,tintedColor, this.textureId, secondaryId, displayedItem);
+        renderer.submit(matrices, queue, light, overlay, this.openness, outlineColor, this.textureId, secondaryId, displayedItem);
     }
 }
