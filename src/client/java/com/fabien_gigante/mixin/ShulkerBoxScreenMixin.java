@@ -28,7 +28,7 @@ public abstract class ShulkerBoxScreenMixin extends AbstractContainerScreen<Shul
 
     private int getColor() {
         DyeColor dye = null;
-        if (this.menu.getType() == MenuType.SHULKER_BOX) // Mod not present on server
+        if (this.menu.getType() == MenuType.SHULKER_BOX) // Mod not present on server, use fallback
             dye = DecoratedShulkerBoxesModClient.lastUsedShulkerBoxColor;
         else if (this.menu instanceof Dyeable dyed) dye = dyed.getColor();
         return ARGB.opaque(dye == null ? DEFAULT_COLOR : dye.getTextureDiffuseColor()); 

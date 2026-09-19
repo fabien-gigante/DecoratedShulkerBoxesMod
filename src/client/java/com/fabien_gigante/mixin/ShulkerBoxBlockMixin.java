@@ -25,6 +25,6 @@ public abstract class ShulkerBoxBlockMixin {
 
     @Inject(method="useWithoutItem", at=@At("HEAD"))
     private void captureLastUsedShulkerBoxColor(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hitResult, final CallbackInfoReturnable<InteractionResult> cir) {
-        DecoratedShulkerBoxesModClient.lastUsedShulkerBoxColor = this.color;
+        DecoratedShulkerBoxesModClient.lastUsedShulkerBoxColor = this.color; // Fall back when mod is only present on client-side
     }
 }
